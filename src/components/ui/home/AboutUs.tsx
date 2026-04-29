@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom"
+
 const AboutUs = () => {
     return (
         <section className="px-4 md:px-6 xl:px-8">
@@ -26,12 +28,12 @@ const AboutUs = () => {
                                 <div className="px-4 py-2 bg-white rounded-xl">Доставка</div>
                             </div>
 
-                            <a
-                                href="/about"
+                            <NavLink
+                                to="/about"
                                 className="inline-flex mt-8 items-center justify-center rounded-xl bg-black text-white px-6 py-3 text-sm md:text-base transition hover:-translate-y-0.5"
                             >
                                 Подробнее о нас
-                            </a>
+                            </NavLink>
                         </div>
 
                         <div

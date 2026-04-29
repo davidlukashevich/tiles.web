@@ -62,7 +62,15 @@ export default function DesktopNavItem({ item }: DesktopNavItemProps) {
                       <li key={child.href}>
                         <NavLink
                           to={child.href}
-                          className="block whitespace-nowrap px-3 py-2 text-[14px] text-neutral-700 transition-colors hover:bg-neutral-50 hover:text-neutral-950"
+                          onClick={() => setIsOpen(false)}
+                          className={({ isActive }) =>
+                            [
+                              "block whitespace-nowrap px-3 py-2 text-[14px] transition-colors",
+                              isActive
+                                ? "bg-neutral-50 text-neutral-950"
+                                : "text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950",
+                            ].join(" ")
+                          }
                         >
                           {child.label}
                         </NavLink>
@@ -78,7 +86,15 @@ export default function DesktopNavItem({ item }: DesktopNavItemProps) {
                 <li key={child.href}>
                   <NavLink
                     to={child.href}
-                    className="block whitespace-nowrap px-3 py-2 text-[14px] text-neutral-700 transition-colors hover:bg-neutral-50 hover:text-neutral-950"
+                    onClick={() => setIsOpen(false)}
+                    className={({ isActive }) =>
+                      [
+                        "block whitespace-nowrap px-3 py-2 text-[14px] transition-colors",
+                        isActive
+                          ? "bg-neutral-50 text-neutral-950"
+                          : "text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950",
+                      ].join(" ")
+                    }
                   >
                     {child.label}
                   </NavLink>

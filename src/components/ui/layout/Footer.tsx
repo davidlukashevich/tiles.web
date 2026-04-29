@@ -172,16 +172,18 @@ export default function Footer({
               target="_blank"
               rel="noreferrer"
               aria-label={item.label}
-              className="flex h-7 w-7 items-center justify-center border border-white/15 hover:border-white/40"
+              className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-white/10 bg-white/5 transition hover:-translate-y-1 hover:border-white/30 hover:bg-white/10 hover:shadow-md"
             >
               {item.img ? (
                 <img
                   src={item.img}
                   alt={item.label}
-                  className="h-6 w-6 object-contain"
+                  className={"h-6 w-6 object-contain"}
                 />
               ) : (
-                <span>{item.label}</span>
+                <span className="text-[11px] font-semibold tracking-[0.12em] text-neutral-700">
+                  {item.label}
+                </span>
               )}
             </a>
           ))}
@@ -201,7 +203,7 @@ export default function Footer({
                 {tileBlock}
                 {relatedBlock}
               </div>
-              
+
               <div className="flex flex-col gap-10">
                 {buyersBlock}
                 {contactsBlock}

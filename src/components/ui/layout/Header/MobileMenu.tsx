@@ -26,23 +26,20 @@ export default function MobileMenu({
 }: MobileMenuProps) {
   return (
     <div
-      className={`fixed inset-0 z-[60] xl:hidden ${
-        isVisible ? "pointer-events-auto" : "pointer-events-none"
-      }`}
+      className={`fixed inset-0 z-[60] xl:hidden ${isVisible ? "pointer-events-auto" : "pointer-events-none"
+        }`}
     >
       <button
         type="button"
         aria-label="Закрыть меню"
         onClick={onClose}
-        className={`absolute inset-0 h-full w-full bg-black/30 transition-opacity duration-300 ${
-          isVisible ? "opacity-100" : "opacity-0"
-        }`}
+        className={`absolute inset-0 h-full w-full bg-black/30 transition-opacity duration-300 ${isVisible ? "opacity-100" : "opacity-0"
+          }`}
       />
 
       <aside
-        className={`absolute right-0 top-0 z-[61] flex h-dvh w-full flex-col overflow-hidden bg-white transition-transform duration-300 ease-out sm:w-[85%] sm:max-w-[460px] sm:shadow-[0_10px_40px_rgba(0,0,0,0.12)] ${
-          isVisible ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`absolute right-0 top-0 z-[61] flex h-dvh w-full flex-col overflow-hidden bg-white transition-transform duration-300 ease-out sm:w-[85%] sm:max-w-[460px] sm:shadow-[0_10px_40px_rgba(0,0,0,0.12)] ${isVisible ? "translate-x-0" : "translate-x-full"
+          }`}
         aria-label="Мобильное меню"
       >
         <div className="flex min-h-[72px] items-center justify-between border-b border-neutral-200 px-4 sm:px-6">
@@ -99,13 +96,13 @@ export default function MobileMenu({
                     target="_blank"
                     rel="noreferrer"
                     aria-label={item.label}
-                    className="flex h-7 w-7 items-center justify-center border border-neutral-300 transition-colors hover:border-neutral-900"
+                    className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-black/5 bg-white transition hover:-translate-y-1 hover:shadow-md"
                   >
                     {item.img ? (
                       <img
                         src={item.img}
                         alt={item.label}
-                        className="h-6 w-6 object-contain"
+                        className={"h-6 w-6 object-contain"}
                       />
                     ) : (
                       <span className="text-[11px] font-semibold tracking-[0.12em] text-neutral-700">

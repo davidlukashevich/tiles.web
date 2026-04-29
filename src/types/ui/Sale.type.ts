@@ -5,3 +5,14 @@ export type SaleItem = {
   image: string;
   badge: string;
 }
+
+export type SaleProduct = {
+  id: number
+  title: string
+  size: string
+  category: string
+  oldPrice: number
+  price: number
+  discount: string
+  image: string
+}

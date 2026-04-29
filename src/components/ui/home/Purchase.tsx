@@ -74,7 +74,7 @@ const PurchaseInfo = () => {
 
                     <div className="mt-8 flex justify-start">
                         <a
-                            href="/purchase-info"
+                            href="/how-to-buy"
                             className="inline-flex items-center justify-center rounded-xl bg-black px-6 py-3 text-sm text-white transition hover:-translate-y-0.5 md:text-base"
                         >
                             Подробнее о покупке

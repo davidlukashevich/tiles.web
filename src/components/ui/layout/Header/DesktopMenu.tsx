@@ -36,7 +36,7 @@ export default function DesktopMenu({
           <span>{phone}</span>
         </a>
 
-        <ul className="flex items-center gap-2 2xl:gap-3" aria-label="Социальные сети">
+        <ul className="flex items-center gap-3" aria-label="Социальные сети">
           {socialLinks.map((item) => (
             <li key={item.label}>
               <a
@@ -44,13 +44,13 @@ export default function DesktopMenu({
                 target="_blank"
                 rel="noreferrer"
                 aria-label={item.label}
-                className="flex h-7 w-7 items-center justify-center border border-neutral-300 transition-colors hover:border-neutral-900"
+                className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-black/5 bg-white transition hover:-translate-y-1 hover:shadow-md"
               >
                 {item.img ? (
                   <img
                     src={item.img}
                     alt={item.label}
-                    className="h-6 w-6 object-contain"
+                    className={"h-6 w-6 object-contain"}
                   />
                 ) : (
                   <span className="text-[11px] font-semibold tracking-[0.12em] text-neutral-700">
