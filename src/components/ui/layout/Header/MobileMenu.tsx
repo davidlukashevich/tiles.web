@@ -2,6 +2,7 @@ import type { SocialLink } from "../../../../data/navigation"
 import type { NavItem } from "../../../../types/ui/Header.type"
 import MobileNavItem from "./MobileNavItem"
 import { FaPhone } from "react-icons/fa6"
+import { IoIosClose } from "react-icons/io"
 
 type MobileMenuProps = {
   isVisible: boolean
@@ -58,7 +59,7 @@ export default function MobileMenu({
             className="flex h-11 w-11 shrink-0 items-center justify-center border border-neutral-300 text-[18px] text-neutral-900 transition-colors hover:border-neutral-900"
             aria-label="Закрыть меню"
           >
-            x
+            <IoIosClose className="h-7 w-7" />
           </button>
         </div>
 

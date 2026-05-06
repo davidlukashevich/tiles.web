@@ -5,6 +5,7 @@ import HomePage from "../pages/HomePage"
 import AboutUsPage from "../pages/AboutUsPage"
 import HowBuyPage from "../pages/HowBuyPage"
 import SalePage from "../pages/SalePage"
+import CatalogPage from "../pages/CatalogPage"
 
 export const router = createBrowserRouter([
   {
@@ -20,8 +21,8 @@ export const router = createBrowserRouter([
         element: <SalePage />,
       },
       {
-        path: "catalog",
-        //element: <CatalogPage />,
+        path: "catalog/:type?/:section?",
+        element: <CatalogPage />,
       },
       {
         path: "product/:id",

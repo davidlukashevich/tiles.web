@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom"
 import type { TileCategory } from "../../../types/ui/TileCategory.type"
 
 type Props = {
@@ -14,24 +15,25 @@ const TileCatalog = ({ categories }: Props) => {
                             Категории
                         </p>
 
-                        <h2 className="mt-3 text-3xl md:text-4xl uppercase">
+                        <h2 className="mt-3 text-3xl uppercase md:text-4xl">
                             Плитка
                         </h2>
                     </div>
 
-                    <a
-                        href="/sale"
+                    <NavLink
+                        to="/catalog/tiles/60x60"
                         className="inline-flex h-11 items-center justify-center rounded-xl border border-black/10 px-5 text-sm text-gray-700 transition hover:bg-black hover:text-white"
                     >
                         Смотреть всё
-                    </a>
+                    </NavLink>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                     {categories.map((category) => (
-                        <div
+                        <NavLink
                             key={category.title}
-                            className="bg-white rounded-xl overflow-hidden transition hover:shadow-xl hover:-translate-y-1 border-b border-black/10"
+                            to={category.href}
+                            className="overflow-hidden rounded-xl border-b border-black/10 bg-white transition hover:-translate-y-1 hover:shadow-xl"
                         >
                             <div
                                 className="h-48 bg-cover bg-center"
@@ -39,17 +41,19 @@ const TileCatalog = ({ categories }: Props) => {
                             />
 
                             <div className="p-4">
-                                <p className="text-xs uppercase text-gray-400 mb-2">
+                                <p className="mb-2 text-xs uppercase text-gray-400">
                                     {category.subtitle}
                                 </p>
+
                                 <h3 className="text-2xl text-gray-700">
                                     {category.title}
                                 </h3>
+
                                 <p className="mt-2 text-sm text-gray-600">
                                     {category.description}
                                 </p>
                             </div>
-                        </div>
+                        </NavLink>
                     ))}
                 </div>
             </div>

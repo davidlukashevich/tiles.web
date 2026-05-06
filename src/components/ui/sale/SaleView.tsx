@@ -25,7 +25,6 @@ export function SaleView({
     onMaxPriceChange,
     onResetFilters,
 }: Props) {
-    // 🔒 Блокировка скролла
     useEffect(() => {
         if (!isFilterOpen) return
 

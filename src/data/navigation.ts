@@ -31,18 +31,18 @@ export const navigation: NavItem[] = [
       {
         label: "Плитка",
         children: [
-          { label: "60x60", href: "/tile/60x60" },
-          { label: "120x60", href: "/tile/120x60" },
-          { label: "80x80", href: "/tile/80x80" },
-          { label: "100x100", href: "/tile/100x100" },
+          { label: "60x60", href: "catalog/tiles/60x60" },
+          { label: "120x60", href: "catalog/tiles/120x60" },
+          { label: "80x80", href: "catalog/tiles/80x80" },
+          { label: "100x100", href: "catalog/tiles/100x100" },
         ],
       },
       {
         label: "Сопутствующие товары",
         children: [
-          { label: "Клей", href: "/products/adhesive" },
-          { label: "Герметик", href: "/products/sealant" },
-          { label: "Фуга", href: "/products/grout" },
+          { label: "Клей", href: "/catalog/accessories/glue" },
+          { label: "Герметик", href: "/catalog/accessories/sealant" },
+          { label: "Фуга", href: "/catalog/accessories/grout" },
         ],
       },
     ],
