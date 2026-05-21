@@ -1,12 +1,13 @@
+import { FaPhone } from "react-icons/fa6"
 import type { NavItem, SocialLink } from "../../../../data/navigation"
 import DesktopNavItem from "./DesktopNavItem"
-import { FaPhone } from "react-icons/fa6"
 
 type DesktopMenuProps = {
   navigation: NavItem[]
   socialLinks: SocialLink[]
   phone: string
   phoneHref: string
+  onOpenProjectModal: () => void
 }
 
 export default function DesktopMenu({
@@ -14,6 +15,7 @@ export default function DesktopMenu({
   socialLinks,
   phone,
   phoneHref,
+  onOpenProjectModal
 }: DesktopMenuProps) {
   return (
     <>
@@ -28,6 +30,14 @@ export default function DesktopMenu({
       </nav>
 
       <div className="hidden items-center gap-5 xl:flex 2xl:gap-8">
+        <button
+          type="button"
+          onClick={onOpenProjectModal}
+          className="inline-flex h-11 self-center items-center justify-center rounded-[12px] border border-black/10 bg-[#f3f1ec] px-5 text-[11px] font-semibold uppercase tracking-[0.08em] text-black transition-all duration-200 hover:border-black hover:bg-black hover:text-white cursor-pointer"
+        >
+          Заказать 3D-проект
+        </button>
+
         <a
           href={phoneHref}
           className="flex items-center gap-2 whitespace-nowrap text-[14px] font-medium tracking-[0.02em] text-neutral-900 transition-opacity hover:opacity-60"
@@ -50,7 +60,7 @@ export default function DesktopMenu({
                   <img
                     src={item.img}
                     alt={item.label}
-                    className={"h-6 w-6 object-contain"}
+                    className="h-6 w-6 object-contain"
                   />
                 ) : (
                   <span className="text-[11px] font-semibold tracking-[0.12em] text-neutral-700">

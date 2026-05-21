@@ -2,7 +2,7 @@ const ContactForm = () => {
   return (
     <section className="px-4 py-10 md:px-6 xl:px-8">
       <div className="mx-auto max-w-[900px]">
-        
+
         <div className="text-center">
           <p className="text-[11px] uppercase tracking-[0.32em] text-[#9a968f]">
             Обратная связь
@@ -45,7 +45,7 @@ const ContactForm = () => {
 
           <button
             type="submit"
-            className="mt-4 h-14 rounded-[18px] bg-[#1f1f1f] text-white text-sm md:text-base transition hover:opacity-90"
+            className="mt-4 inline-flex h-14 items-center justify-center rounded-[18px] border border-black/10 bg-[#f3f1ec] px-6 text-[13px] font-semibold uppercase tracking-[0.08em] text-black transition-all duration-200 hover:border-black hover:bg-black hover:text-white"
           >
             Отправить заявку
           </button>

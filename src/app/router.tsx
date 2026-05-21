@@ -1,11 +1,11 @@
 import { createBrowserRouter } from "react-router-dom"
 
 import App from "../app/App"
-import HomePage from "../pages/HomePage"
 import AboutUsPage from "../pages/AboutUsPage"
-import HowBuyPage from "../pages/HowBuyPage"
-import SalePage from "../pages/SalePage"
 import CatalogPage from "../pages/CatalogPage"
+import HomePage from "../pages/HomePage"
+import HowBuyPage from "../pages/HowBuyPage"
+import ProductPage from "../pages/ProductPage"
 
 export const router = createBrowserRouter([
   {
@@ -16,17 +16,17 @@ export const router = createBrowserRouter([
         index: true,
         element: <HomePage />,
       },
-      {
-        path: "sale",
-        element: <SalePage />,
-      },
+      // {
+      //   path: "catalog/sale",
+      //   element: <SalePage />,
+      // },
       {
         path: "catalog/:type?/:section?",
         element: <CatalogPage />,
       },
       {
         path: "product/:id",
-        // element: <ProductPage />,
+        element: <ProductPage />,
       },
       {
         path: "about",

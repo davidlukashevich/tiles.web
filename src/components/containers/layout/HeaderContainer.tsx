@@ -11,6 +11,7 @@ import { toggleSectionValue } from "../../../helpers/Header/toggleSectionValue"
 export default function HeaderContainer() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [openSection, setOpenSection] = useState<string | null>(null)
+  const [projectModalOpen, setProjectModalOpen] = useState(false)
 
   const handleOpenMobileMenu = () => {
     setMobileMenuOpen(true)
@@ -63,6 +64,9 @@ export default function HeaderContainer() {
       openSection={openSection}
       navigation={navigation}
       socialLinks={socialLinks}
+      projectModalOpen={projectModalOpen}
+      onOpenProjectModal={() => setProjectModalOpen(true)}
+      onCloseProjectModal={() => setProjectModalOpen(false)}
       onOpenMobileMenu={handleOpenMobileMenu}
       onCloseMobileMenu={handleCloseMobileMenu}
       onToggleSection={handleToggleSection}

@@ -1,8 +1,8 @@
+import { FaPhone } from "react-icons/fa6"
+import { IoIosClose } from "react-icons/io"
 import type { SocialLink } from "../../../../data/navigation"
 import type { NavItem } from "../../../../types/ui/Header.type"
 import MobileNavItem from "./MobileNavItem"
-import { FaPhone } from "react-icons/fa6"
-import { IoIosClose } from "react-icons/io"
 
 type MobileMenuProps = {
   isVisible: boolean
@@ -13,6 +13,7 @@ type MobileMenuProps = {
   openSection: string | null
   onClose: () => void
   onToggleSection: (label: string) => void
+  onOpenProjectModal: () => void
 }
 
 export default function MobileMenu({
@@ -24,10 +25,13 @@ export default function MobileMenu({
   openSection,
   onClose,
   onToggleSection,
+  onOpenProjectModal
 }: MobileMenuProps) {
   return (
     <div
-      className={`fixed inset-0 z-[60] xl:hidden ${isVisible ? "pointer-events-auto" : "pointer-events-none"
+      className={`fixed inset-0 z-[60] xl:hidden ${isVisible
+        ? "pointer-events-auto"
+        : "pointer-events-none"
         }`}
     >
       <button
@@ -39,7 +43,9 @@ export default function MobileMenu({
       />
 
       <aside
-        className={`absolute right-0 top-0 z-[61] flex h-dvh w-full flex-col overflow-hidden bg-white transition-transform duration-300 ease-out sm:w-[85%] sm:max-w-[460px] sm:shadow-[0_10px_40px_rgba(0,0,0,0.12)] ${isVisible ? "translate-x-0" : "translate-x-full"
+        className={`absolute right-0 top-0 z-[61] flex h-dvh w-full flex-col overflow-hidden bg-white transition-transform duration-300 ease-out sm:w-[85%] sm:max-w-[460px] sm:shadow-[0_10px_40px_rgba(0,0,0,0.12)] ${isVisible
+          ? "translate-x-0"
+          : "translate-x-full"
           }`}
         aria-label="Мобильное меню"
       >
@@ -48,6 +54,7 @@ export default function MobileMenu({
             <div className="text-[14px] font-semibold uppercase tracking-[0.14em] text-neutral-950">
               Меню
             </div>
+
             <div className="mt-1 text-[12px] text-neutral-500">
               Навигация по сайту
             </div>
@@ -77,9 +84,19 @@ export default function MobileMenu({
           </nav>
 
           <div className="mt-4">
+            <button
+              type="button"
+              onClick={() => {
+                onClose()
+                onOpenProjectModal()
+              }}
+              className="flex h-12 w-full items-center justify-center rounded-[14px] border border-black/10 bg-[#f3f1ec] px-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-black transition-all duration-200 hover:border-black hover:bg-black hover:text-white cursor-pointer"
+            >
+              Заказать 3D-проект
+            </button>
             <a
               href={phoneHref}
-              className="flex items-center gap-2 text-[18px] font-semibold text-neutral-950"
+              className="flex items-center gap-2 text-[18px] font-semibold text-neutral-950 mt-4"
             >
               <FaPhone className="shrink-0" />
               <span>{phone}</span>
@@ -89,7 +106,10 @@ export default function MobileMenu({
               Ежедневно, с 9:00 до 20:00
             </p>
 
-            <ul className="mt-6 flex items-center gap-3" aria-label="Социальные сети">
+            <ul
+              className="mt-4 flex items-center gap-3"
+              aria-label="Социальные сети"
+            >
               {socialLinks.map((item) => (
                 <li key={item.label}>
                   <a
@@ -103,7 +123,7 @@ export default function MobileMenu({
                       <img
                         src={item.img}
                         alt={item.label}
-                        className={"h-6 w-6 object-contain"}
+                        className="h-6 w-6 object-contain"
                       />
                     ) : (
                       <span className="text-[11px] font-semibold tracking-[0.12em] text-neutral-700">

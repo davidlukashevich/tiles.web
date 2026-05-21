@@ -1,9 +1,15 @@
 export type SaleItem = {
-  title: string;
-  subtitle: string;
-  description: string;
-  image: string;
-  badge: string;
+  id: string
+  title: string
+  subtitle: string
+  description: string
+  image: string
+
+  price: string
+  oldPrice?: string
+
+  isSale?: boolean
+  discountPercent?: number
 }
 
 export type SaleProduct = {

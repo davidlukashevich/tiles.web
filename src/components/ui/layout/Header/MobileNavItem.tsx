@@ -15,7 +15,12 @@ export default function MobileNavItem({
   onNavigate,
 }: MobileNavItemProps) {
   const isOpen = openSection === item.label
-  const hasDropdown = Boolean(item.children?.length || item.groups?.length)
+
+  const hasDropdown = Boolean(
+    item.children?.length ||
+    item.groups?.length ||
+    item.promo
+  )
 
   if (!hasDropdown) {
     return (
@@ -38,28 +43,31 @@ export default function MobileNavItem({
         aria-expanded={isOpen}
       >
         <span>{item.label}</span>
+
         <span
-          className={`text-[10px] transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`text-[10px] transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+            }`}
         >
           ▼
         </span>
       </button>
 
       <div
-        className={`grid transition-all duration-300 ${
-          isOpen ? "grid-rows-[1fr] pb-4" : "grid-rows-[0fr]"
-        }`}
+        className={`grid transition-all duration-300 ${isOpen ? "grid-rows-[1fr] pb-4" : "grid-rows-[0fr]"
+          }`}
       >
         <div className="overflow-hidden">
           {item.groups?.length ? (
             <div className="space-y-4 pl-2">
               {item.groups.map((group) => (
                 <div key={group.label}>
-                  <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400">
+                  <NavLink
+                    to={group.href}
+                    onClick={onNavigate}
+                    className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.16em] text-neutral-400 transition-colors hover:text-neutral-950"
+                  >
                     {group.label}
-                  </div>
+                  </NavLink>
 
                   <ul className="space-y-1">
                     {group.children.map((child) => (
@@ -67,7 +75,7 @@ export default function MobileNavItem({
                         <NavLink
                           to={child.href}
                           onClick={onNavigate}
-                          className="block py-2 text-[14px] text-neutral-600 transition-colors hover:text-neutral-950"
+                          className="block rounded-xl py-2 text-[14px] text-neutral-600 transition-colors hover:text-neutral-950"
                         >
                           {child.label}
                         </NavLink>
@@ -84,7 +92,7 @@ export default function MobileNavItem({
                   <NavLink
                     to={child.href}
                     onClick={onNavigate}
-                    className="block py-2 text-[14px] text-neutral-600 transition-colors hover:text-neutral-950"
+                    className="block rounded-xl py-2 text-[14px] text-neutral-600 transition-colors hover:text-neutral-950"
                   >
                     {child.label}
                   </NavLink>
@@ -92,6 +100,18 @@ export default function MobileNavItem({
               ))}
             </ul>
           )}
+
+          {item.promo ? (
+            <div className="mt-4 pl-2">
+              <NavLink
+                to={item.promo.href}
+                onClick={onNavigate}
+                className="flex h-11 items-center justify-center rounded-[14px] border border-black/10 bg-[#f3f1ec] px-4 text-[12px] font-semibold uppercase tracking-[0.08em] text-black transition-all duration-200 hover:border-black hover:bg-black hover:text-white"
+              >
+                {item.promo.label}
+              </NavLink>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

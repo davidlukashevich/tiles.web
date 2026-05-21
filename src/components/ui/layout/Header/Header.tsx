@@ -5,6 +5,7 @@ import DesktopMenu from "./DesktopMenu"
 import MobileMenu from "./MobileMenu"
 import { FaPhone } from "react-icons/fa6"
 import { NavLink } from "react-router-dom"
+import ProjectModal from "../../modal/ProjectModal"
 
 export type HeaderProps = {
   logoSrc: string
@@ -16,6 +17,9 @@ export type HeaderProps = {
   openSection: string | null
   navigation: NavItem[]
   socialLinks: SocialLink[]
+  projectModalOpen: boolean
+  onOpenProjectModal: () => void
+  onCloseProjectModal: () => void
   onOpenMobileMenu: () => void
   onCloseMobileMenu: () => void
   onToggleSection: (label: string) => void
@@ -33,6 +37,9 @@ export default function Header({
   openSection,
   navigation,
   socialLinks,
+  projectModalOpen,
+  onCloseProjectModal,
+  onOpenProjectModal,
   onOpenMobileMenu,
   onCloseMobileMenu,
   onToggleSection,
@@ -114,6 +121,7 @@ export default function Header({
               socialLinks={socialLinks}
               phone={phone}
               phoneHref={phoneHref}
+              onOpenProjectModal={onOpenProjectModal}
             />
 
             <div className="flex items-center gap-2 xl:hidden">
@@ -153,8 +161,14 @@ export default function Header({
           openSection={openSection}
           onClose={onCloseMobileMenu}
           onToggleSection={onToggleSection}
+          onOpenProjectModal={onOpenProjectModal}
         />
       )}
+
+      <ProjectModal
+        isOpen={projectModalOpen}
+        onClose={onCloseProjectModal}
+      />
     </>
   )
 }

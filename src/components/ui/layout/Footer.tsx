@@ -1,11 +1,10 @@
 import { NavLink } from "react-router-dom"
+import type {
+  NavItem,
+  SocialLink,
+  NavLinkItem,
+} from "../../../data/navigation"
 import { FaPhone } from "react-icons/fa6"
-import type { NavItem, SocialLink } from "../../../data/navigation"
-
-type FooterLink = {
-  label: string
-  href: string
-}
 
 type FooterProps = {
   logoSrc: string
@@ -17,7 +16,7 @@ type FooterProps = {
   addressLines: string[]
   navigation: NavItem[]
   socialLinks: SocialLink[]
-  legalLinks: FooterLink[]
+  legalLinks: NavLinkItem[]
   copyright: string
 }
 
@@ -34,204 +33,158 @@ export default function Footer({
   legalLinks,
   copyright,
 }: FooterProps) {
-  const catalogSection = navigation.find((item) => item.label === "Каталог")
-  const buySection = navigation.find((item) => item.label === "Как купить")
-  const aboutSection = navigation.find((item) => item.label === "О нас")
-  const saleSection = navigation.find((item) => item.label === "Распродажа")
+  const catalogItem = navigation.find((item) => item.label === "Каталог")
+  const selectionItem = navigation.find((item) => item.label === "Подборка")
+  const howToBuyItem = navigation.find((item) => item.label === "Как купить")
+  const aboutItem = navigation.find((item) => item.label === "О нас")
 
-  const tileGroup = catalogSection?.groups?.find(
-    (group) => group.label === "Плитка"
-  )
-
-  const relatedGroup = catalogSection?.groups?.find(
-    (group) => group.label === "Сопутствующие товары"
-  )
-
-  const logoBlock = (
-    <div className="space-y-4 xl:pr-8">
-      <NavLink to="/" className="inline-flex items-start gap-5">
-        <img
-          src={logoSrc}
-          alt={brandName}
-          className="h-14 w-14 shrink-0 object-cover"
-        />
-
-        <div>
-          <div className="text-[18px] font-semibold uppercase tracking-[0.18em]">
-            {brandName}
-          </div>
-
-          {brandSubtitle && (
-            <div className="mt-2 text-[12px] uppercase tracking-[0.28em] text-white/55">
-              {brandSubtitle}
-            </div>
-          )}
-        </div>
-      </NavLink>
-    </div>
-  )
-
-  const tileBlock = (
-    <div>
-      <h3 className="mb-5 text-sm font-semibold uppercase tracking-[0.18em] text-white/90">
-        Плитка
-      </h3>
-
-      <ul className="space-y-3 text-sm text-white/65">
-        {saleSection?.href && (
-          <li>
-            <NavLink to={saleSection.href} className="hover:text-white">
-              {saleSection.label}
-            </NavLink>
-          </li>
-        )}
-
-        {tileGroup?.children.map((item) => (
-          <li key={item.href}>
-            <NavLink to={item.href} className="hover:text-white">
-              {item.label}
-            </NavLink>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-
-  const relatedBlock = (
-    <div>
-      <h3 className="mb-5 text-sm font-semibold uppercase tracking-[0.18em] text-white/90">
-        Сопутствующие товары
-      </h3>
-
-      <ul className="space-y-3 text-sm text-white/65">
-        {relatedGroup?.children.map((item) => (
-          <li key={item.href}>
-            <NavLink to={item.href} className="hover:text-white">
-              {item.label}
-            </NavLink>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-
-  const buyersBlock = (
-    <div>
-      <h3 className="mb-5 text-sm font-semibold uppercase tracking-[0.18em] text-white/90">
-        Покупателям
-      </h3>
-
-      <ul className="space-y-3 text-sm text-white/65">
-        {buySection?.children?.map((item) => (
-          <li key={item.href}>
-            <NavLink to={item.href} className="hover:text-white">
-              {item.label}
-            </NavLink>
-          </li>
-        ))}
-
-        {aboutSection?.href && (
-          <li>
-            <NavLink to={aboutSection.href} className="hover:text-white">
-              {aboutSection.label}
-            </NavLink>
-          </li>
-        )}
-      </ul>
-    </div>
-  )
-
-  const contactsBlock = (
-    <div>
-      <h3 className="mb-5 text-sm font-semibold uppercase tracking-[0.18em] text-white/90">
-        Контакты
-      </h3>
-
-      <div className="space-y-4">
-        <a
-          href={phoneHref}
-          className="inline-flex items-center gap-3 text-sm text-white/85 hover:text-white"
-        >
-          <FaPhone />
-          <span>{phone}</span>
-        </a>
-
-        <p className="text-sm text-white/65">{workTime}</p>
-
-        <address className="not-italic text-sm text-white/65">
-          {addressLines.map((line) => (
-            <div key={line}>{line}</div>
-          ))}
-        </address>
-
-        <div className="flex items-center gap-3 pt-2">
-          {socialLinks.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              target="_blank"
-              rel="noreferrer"
-              aria-label={item.label}
-              className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-white/10 bg-white/5 transition hover:-translate-y-1 hover:border-white/30 hover:bg-white/10 hover:shadow-md"
-            >
-              {item.img ? (
-                <img
-                  src={item.img}
-                  alt={item.label}
-                  className={"h-6 w-6 object-contain"}
-                />
-              ) : (
-                <span className="text-[11px] font-semibold tracking-[0.12em] text-neutral-700">
-                  {item.label}
-                </span>
-              )}
-            </a>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
+  const tileLinks = catalogItem?.groups?.[0]?.children ?? []
+  const accessoriesLinks = catalogItem?.groups?.[1]?.children ?? []
+  const selectionLinks = selectionItem?.children ?? []
+  const buyerLinks = howToBuyItem?.children ?? []
 
   return (
-    <footer className="bg-[#2b2727] text-white">
-      <div className="mx-auto w-full max-w-[1280px] px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-        <div className="border-b border-white/10 pb-10">
-          <div className="block xl:hidden">
-            <div className="grid grid-cols-1 gap-y-10 md:grid-cols-2 md:gap-x-12">
-              <div className="flex flex-col gap-10">
-                {logoBlock}
-                {tileBlock}
-                {relatedBlock}
-              </div>
+    <footer className="bg-[#292625] px-4 py-14 text-white md:px-6 xl:px-8">
+      <div className="mx-auto max-w-[1280px]">
+        <div className="grid gap-10 lg:grid-cols-[260px_1fr]">
+          <div>
+            <NavLink to="/" className="flex items-start gap-4">
+              <img
+                src={logoSrc}
+                alt={brandName}
+                className="h-14 w-14 shrink-0 object-cover"
+              />
 
-              <div className="flex flex-col gap-10">
-                {buyersBlock}
-                {contactsBlock}
+              <div>
+                <div className="text-[18px] font-semibold uppercase tracking-[0.18em]">
+                  {brandName}
+                </div>
+
+                {brandSubtitle ? (
+                  <div className="mt-3 text-[12px] uppercase tracking-[0.35em] text-white/45">
+                    {brandSubtitle}
+                  </div>
+                ) : null}
               </div>
-            </div>
+            </NavLink>
           </div>
 
-          <div className="hidden xl:grid xl:grid-cols-[1.35fr_0.85fr_0.95fr_1fr_0.95fr] xl:items-start xl:gap-x-10">
-            {logoBlock}
-            {tileBlock}
-            {relatedBlock}
-            {buyersBlock}
-            {contactsBlock}
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+            <FooterColumn title="Плитка" links={tileLinks} />
+
+            <FooterColumn title="Сопутствующие товары" links={accessoriesLinks} />
+
+            <FooterColumn title="Подборка" links={selectionLinks} />
+
+            <div>
+              <FooterColumn title="Покупателям" links={buyerLinks} />
+
+              {aboutItem?.href ? (
+                <NavLink
+                  to={aboutItem.href}
+                  className="mt-4 block text-[14px] text-white/70 transition hover:text-white"
+                >
+                  О нас
+                </NavLink>
+              ) : null}
+            </div>
+
+            <div>
+              <h3 className="text-[13px] font-semibold uppercase tracking-[0.28em]">
+                Контакты
+              </h3>
+
+              <a
+                href={phoneHref}
+                className="mt-6 flex items-center gap-3 text-[14px] text-white transition hover:text-white/70"
+              >
+                <FaPhone className="shrink-0" />
+                <span>{phone}</span>
+              </a>
+
+              <p className="mt-5 text-[14px] leading-6 text-white/70">
+                {workTime}
+              </p>
+
+              <div className="mt-5 text-[14px] leading-6 text-white/70">
+                {addressLines.map((line) => (
+                  <p key={line}>{line}</p>
+                ))}
+              </div>
+
+              <ul className="mt-6 flex items-center gap-3">
+                {socialLinks.map((item) => (
+                  <li key={item.label}>
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={item.label}
+                      className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-white/10 bg-white/5 transition hover:-translate-y-1 hover:bg-white/10"
+                    >
+                      {item.img ? (
+                        <img
+                          src={item.img}
+                          alt={item.label}
+                          className="h-6 w-6 object-contain"
+                        />
+                      ) : (
+                        <span className="text-[11px] font-semibold">
+                          {item.label}
+                        </span>
+                      )}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 pt-6 text-sm text-white/45 lg:flex-row lg:justify-between">
+        <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-7 text-[13px] text-white/45 md:flex-row md:items-center md:justify-between">
           <p>{copyright}</p>
 
-          <div className="flex flex-wrap gap-4">
-            {legalLinks.map((item) => (
-              <NavLink key={item.href} to={item.href} className="hover:text-white">
-                {item.label}
+          <div className="flex flex-wrap gap-5">
+            {legalLinks.map((link) => (
+              <NavLink
+                key={link.href}
+                to={link.href}
+                className="transition hover:text-white"
+              >
+                {link.label}
               </NavLink>
             ))}
           </div>
         </div>
       </div>
     </footer>
+  )
+}
+
+type FooterColumnProps = {
+  title: string
+  links: NavLinkItem[]
+}
+
+const FooterColumn = ({ title, links }: FooterColumnProps) => {
+  return (
+    <div>
+      <h3 className="text-[13px] font-semibold uppercase tracking-[0.28em]">
+        {title}
+      </h3>
+
+      <ul className="mt-6 space-y-3">
+        {links.map((link) => (
+          <li key={link.href}>
+            <NavLink
+              to={link.href}
+              className="text-[14px] text-white/70 transition hover:text-white"
+            >
+              {link.label}
+            </NavLink>
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }

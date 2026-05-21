@@ -42,13 +42,14 @@ const CatalogFilterModal = ({
   onApply,
 }: Props) => {
   useEffect(() => {
-    if (!isOpen) return
-
-    const originalOverflow = document.body.style.overflow
-    document.body.style.overflow = "hidden"
+    if (isOpen) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = ""
+    }
 
     return () => {
-      document.body.style.overflow = originalOverflow
+      document.body.style.overflow = ""
     }
   }, [isOpen])
 
@@ -56,7 +57,14 @@ const CatalogFilterModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end bg-black/40 px-4 py-4 sm:items-center sm:justify-center">
-      <div className="max-h-[90vh] w-full overflow-y-auto rounded-[28px] bg-white p-5 shadow-xl sm:max-w-[520px] sm:p-6">
+      <button
+        type="button"
+        onClick={onClose}
+        className="absolute inset-0 cursor-pointer"
+        aria-label="Закрыть"
+      />
+
+      <div className="relative max-h-[90vh] w-full overflow-y-auto rounded-[28px] bg-white p-5 shadow-2xl sm:max-w-[520px] sm:p-6">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-xl font-medium uppercase text-black">
             Фильтрация
@@ -65,7 +73,8 @@ const CatalogFilterModal = ({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-[#f3f0ea] text-xl"
+            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-[#f3f0ea] text-neutral-900 transition-all duration-200 hover:scale-105 hover:bg-black hover:text-white"
+            aria-label="Закрыть"
           >
             <IoIosClose className="h-7 w-7" />
           </button>
@@ -77,14 +86,18 @@ const CatalogFilterModal = ({
               <label className="mb-2 block text-sm text-neutral-500">
                 Цена от
               </label>
+
               <input
                 type="number"
                 value={filters.priceFrom}
                 onChange={(event) =>
-                  onChange({ ...filters, priceFrom: event.target.value })
+                  onChange({
+                    ...filters,
+                    priceFrom: event.target.value,
+                  })
                 }
                 placeholder="0"
-                className="w-full rounded-2xl border border-neutral-200 px-4 py-3 text-sm outline-none focus:border-black"
+                className="w-full rounded-2xl border border-neutral-200 px-4 py-3 text-sm outline-none transition focus:border-black"
               />
             </div>
 
@@ -92,14 +105,18 @@ const CatalogFilterModal = ({
               <label className="mb-2 block text-sm text-neutral-500">
                 Цена до
               </label>
+
               <input
                 type="number"
                 value={filters.priceTo}
                 onChange={(event) =>
-                  onChange({ ...filters, priceTo: event.target.value })
+                  onChange({
+                    ...filters,
+                    priceTo: event.target.value,
+                  })
                 }
                 placeholder="999"
-                className="w-full rounded-2xl border border-neutral-200 px-4 py-3 text-sm outline-none focus:border-black"
+                className="w-full rounded-2xl border border-neutral-200 px-4 py-3 text-sm outline-none transition focus:border-black"
               />
             </div>
           </div>
@@ -111,7 +128,10 @@ const CatalogFilterModal = ({
             onToggle={(value) =>
               onChange({
                 ...filters,
-                manufacturers: toggleValue(filters.manufacturers, value),
+                manufacturers: toggleValue(
+                  filters.manufacturers,
+                  value
+                ),
               })
             }
           />
@@ -123,7 +143,10 @@ const CatalogFilterModal = ({
             onToggle={(value) =>
               onChange({
                 ...filters,
-                surfaceTypes: toggleValue(filters.surfaceTypes, value),
+                surfaceTypes: toggleValue(
+                  filters.surfaceTypes,
+                  value
+                ),
               })
             }
           />
@@ -132,7 +155,7 @@ const CatalogFilterModal = ({
             <button
               type="button"
               onClick={onReset}
-              className="cursor-pointer rounded-2xl bg-[#f3f0ea] px-5 py-4 text-sm font-medium text-black"
+              className="cursor-pointer rounded-2xl bg-[#f3f0ea] px-5 py-4 text-sm font-medium text-black transition hover:bg-[#e7e3dc]"
             >
               Сбросить
             </button>
@@ -140,7 +163,7 @@ const CatalogFilterModal = ({
             <button
               type="button"
               onClick={onApply}
-              className="cursor-pointer rounded-2xl bg-black px-5 py-4 text-sm font-medium text-white"
+              className="cursor-pointer rounded-2xl bg-black px-5 py-4 text-sm font-medium text-white transition hover:opacity-85"
             >
               Показать
             </button>
@@ -181,7 +204,7 @@ function FilterCheckboxGroup({
               key={option}
               type="button"
               onClick={() => onToggle(option)}
-              className={`rounded-2xl border px-4 py-3 text-sm transition ${isActive
+              className={`cursor-pointer rounded-2xl border px-4 py-3 text-sm transition ${isActive
                   ? "border-black bg-black text-white"
                   : "border-neutral-200 bg-white text-neutral-700 hover:border-black"
                 }`}

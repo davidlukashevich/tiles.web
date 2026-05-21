@@ -21,8 +21,8 @@ const TileCatalog = ({ categories }: Props) => {
                     </div>
 
                     <NavLink
-                        to="/catalog/tiles/60x60"
-                        className="inline-flex h-11 items-center justify-center rounded-xl border border-black/10 px-5 text-sm text-gray-700 transition hover:bg-black hover:text-white"
+                        to="/catalog/tiles"
+                        className="inline-flex h-11 items-center justify-center rounded-xl border border-black/10 bg-[#f3f1ec] px-5 text-sm text-gray-700 transition hover:bg-black hover:text-white"
                     >
                         Смотреть всё
                     </NavLink>

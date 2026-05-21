@@ -54,7 +54,7 @@ export function SaleView({
                     <button
                         type="button"
                         onClick={onOpenFilter}
-                        className="w-full rounded-2xl bg-black px-5 py-3 text-sm font-medium text-white transition-opacity hover:opacity-80 sm:w-auto"
+                        className="w-full rounded-[18px] border border-black/10 bg-[#f3f1ec] px-5 py-3 text-[13px] font-semibold tracking-[0.08em] text-black transition-all duration-200 hover:border-black hover:bg-black hover:text-white sm:w-auto"
                     >
                         Фильтр
                     </button>

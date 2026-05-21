@@ -22,34 +22,65 @@ const CatalogSidebarContent = ({
 }: SidebarContentProps) => {
   return (
     <div className="rounded-[24px] border border-black/10 bg-white p-5">
-      {groups.map((group, groupIndex) => (
-        <div key={group.title} className={groupIndex > 0 ? "mt-7" : ""}>
-          <p className="mb-4 text-xs uppercase tracking-[0.28em] text-gray-400">
-            {group.title}
-          </p>
+      {groups.map((group, groupIndex) => {
+        const isGroupActive = group.value === activeValue
+        const isSaleGroup = group.value === "sale"
+        const hasItems = group.items.length > 0
 
-          <ul className="space-y-2">
-            {group.items.map((item) => {
-              const isActive = item.value === activeValue
+        return (
+          <div
+            key={group.value}
+            className={`
+        ${groupIndex > 0 ? "mt-7 pt-7 border-t border-black/10" : ""}
+      `}
+          >
+            {isSaleGroup ? (
+              <NavLink
+                to={group.href}
+                onClick={onNavigate}
+                className={`flex h-11 items-center justify-center rounded-[14px] border border-black/10 px-4 text-[12px] font-semibold uppercase tracking-[0.08em] transition-all duration-200 ${isGroupActive
+                    ? "bg-black text-white"
+                    : "bg-[#f3f1ec] text-black hover:border-black hover:bg-black hover:text-white"
+                  }`}
+              >
+                {group.title}
+              </NavLink>
+            ) : (
+              <NavLink
+                to={group.href}
+                onClick={onNavigate}
+                className={`mb-4 block text-xs font-semibold uppercase tracking-[0.28em] transition hover:text-black ${isGroupActive ? "text-black" : "text-gray-400"
+                  }`}
+              >
+                {group.title}
+              </NavLink>
+            )}
 
-              return (
-                <li key={item.value}>
-                  <NavLink
-                    to={item.href}
-                    onClick={onNavigate}
-                    className={`block w-full rounded-xl px-4 py-3 text-left text-sm transition ${isActive
-                        ? "bg-black text-white"
-                        : "text-gray-700 hover:bg-[#f3f1ec]"
-                      }`}
-                  >
-                    {item.label}
-                  </NavLink>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
-      ))}
+            {hasItems ? (
+              <ul className="space-y-2">
+                {group.items.map((item) => {
+                  const isActive = item.value === activeValue
+
+                  return (
+                    <li key={item.value}>
+                      <NavLink
+                        to={item.href}
+                        onClick={onNavigate}
+                        className={`block w-full rounded-xl px-4 py-3 text-left text-sm transition ${isActive
+                            ? "bg-black text-white"
+                            : "text-gray-700 hover:bg-[#f3f1ec]"
+                          }`}
+                      >
+                        {item.label}
+                      </NavLink>
+                    </li>
+                  )
+                })}
+              </ul>
+            ) : null}
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -63,7 +94,10 @@ const CatalogSidebar = ({
   return (
     <>
       <aside className="hidden xl:block">
-        <CatalogSidebarContent groups={groups} activeValue={activeValue} />
+        <CatalogSidebarContent
+          groups={groups}
+          activeValue={activeValue}
+        />
       </aside>
 
       <div

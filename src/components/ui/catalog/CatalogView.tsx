@@ -57,7 +57,7 @@ const CatalogView = ({
   }, [isFilterOpen])
 
   return (
-    <main className="bg-white px-4 py-10 md:px-6 xl:px-8 xl:py-14">
+    <main className="bg-white py-10 xl:py-14">
       <section className="mx-auto max-w-[1280px]">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
@@ -82,7 +82,7 @@ const CatalogView = ({
             <button
               type="button"
               onClick={onOpenFilter}
-              className="inline-flex h-11 items-center justify-center rounded-xl bg-black px-5 text-sm text-white transition hover:opacity-90"
+              className="w-full rounded-[18px] border border-black/10 bg-[#f3f1ec] px-5 py-3 text-[13px] font-semibold tracking-[0.08em] text-black transition-all duration-200 hover:border-black hover:bg-black hover:text-white sm:w-auto"
             >
               Фильтр
             </button>
@@ -109,7 +109,7 @@ const CatalogView = ({
 
           <div className="min-w-0">
             {products.length > 0 ? (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 2xl:grid-cols-3">
                 {products.map((product) => (
                   <CatalogProductCard key={product.id} product={product} />
                 ))}

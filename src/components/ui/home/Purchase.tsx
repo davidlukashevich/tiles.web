@@ -1,4 +1,4 @@
-import { CreditCard, Truck, Store, RotateCcw, ShieldCheck, Wallet } from 'lucide-react';
+import { CreditCard, RotateCcw, Store, Truck, Wallet } from 'lucide-react';
 
 const PurchaseInfo = () => {
     const purchaseItems = [
@@ -26,11 +26,6 @@ const PurchaseInfo = () => {
             title: 'Прием и возврат товара',
             description: 'Простые и понятные условия возврата и обмена товара.',
             icon: RotateCcw,
-        },
-        {
-            title: 'Гарантийное обслуживание',
-            description: 'Мы предоставляем гарантию и поддерживаем вас после покупки.',
-            icon: ShieldCheck,
         }
     ]
 

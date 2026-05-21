@@ -1,228 +1,186 @@
 import { useMemo, useState } from "react"
 import { useParams } from "react-router-dom"
+import CatalogView from "../../ui/catalog/CatalogView"
 import type {
   CatalogFilters,
   CatalogGroup,
   CatalogProduct,
 } from "../../../types/ui/Catalog.type"
-import CatalogView from "../../ui/catalog/CatalogView"
 
 const catalogGroups: CatalogGroup[] = [
   {
     title: "Плитка",
+    value: "tiles",
+    href: "/catalog/tiles",
     items: [
+      { label: "60x60", value: "60x60", href: "/catalog/tiles/60x60" },
+      { label: "80x80", value: "80x80", href: "/catalog/tiles/80x80" },
+      { label: "120x60", value: "120x60", href: "/catalog/tiles/120x60" },
+      { label: "120x20", value: "120x20", href: "/catalog/tiles/120x20" },
+      { label: "160x80", value: "160x80", href: "/catalog/tiles/160x80" },
       {
-        label: "60x60",
-        href: "/catalog/tiles/60x60",
-        value: "60x60",
-      },
-      {
-        label: "80x80",
-        href: "/catalog/tiles/80x80",
-        value: "80x80",
-      },
-      {
-        label: "100x100",
-        href: "/catalog/tiles/100x100",
-        value: "100x100",
-      },
-      {
-        label: "120x60",
-        href: "/catalog/tiles/120x60",
-        value: "120x60",
+        label: "Керамическая плитка",
+        value: "ceramic-tile",
+        href: "/catalog/ceramic-tile",
       },
     ],
   },
   {
     title: "Сопутствующие товары",
+    value: "accessories",
+    href: "/catalog/accessories",
     items: [
-      {
-        label: "Клей",
-        href: "/catalog/accessories/glue",
-        value: "glue",
-      },
-      {
-        label: "Герметик",
-        href: "/catalog/accessories/sealant",
-        value: "sealant",
-      },
-      {
-        label: "Фуга",
-        href: "/catalog/accessories/grout",
-        value: "grout",
-      },
+      { label: "Строительные смеси", value: "mixes", href: "/catalog/accessories/mixes" },
+      { label: "Затирка", value: "grout", href: "/catalog/accessories/grout" },
+      { label: "Силикон", value: "silicone", href: "/catalog/accessories/silicone" },
+      { label: "Прочее", value: "other", href: "/catalog/accessories/other" },
     ],
+  },
+  {
+    title: "Распродажа",
+    value: "sale",
+    href: "/catalog/sale",
+    items: [],
   },
 ]
 
 const products: CatalogProduct[] = [
   {
     id: "1",
-    title: "Керамогранит серый 60x60",
-    category: "Плитка · 60x60",
+    title: "Керамогранит светлый 60x60",
+    category: "Керамогранит · 60x60",
     categoryValue: "60x60",
-    format: "60x60",
-    manufacturer: "Cersanit",
-    surfaceType: "Матовая",
     image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-    price: 69,
-    oldPrice: 89,
-    badge: "-22%",
+    price: 82,
+    oldPrice: 99,
     href: "/product/1",
+    manufacturer: "Kerama Marazzi",
+    formats: ["60x60", "120x60"],
+    surfaceTypes: ["Глянцевая", "Лаппатированная"],
+    isSale: true,
+    discountPercent: 17,
   },
   {
     id: "2",
-    title: "Плитка светлая 60x60",
-    category: "Плитка · 60x60",
-    categoryValue: "60x60",
-    format: "60x60",
-    manufacturer: "Kerama Marazzi",
-    surfaceType: "Глянцевая",
+    title: "Керамогранит под мрамор 80x80",
+    category: "Керамогранит · 80x80",
+    categoryValue: "80x80",
     image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-    price: 82,
-    oldPrice: 99,
-    badge: "-17%",
+    price: 79,
+    oldPrice: 95,
     href: "/product/2",
-  },
-  {
-    id: "2",
-    title: "Плитка светлая 60x60",
-    category: "Плитка · 60x60",
-    categoryValue: "60x60",
-    format: "60x60",
-    manufacturer: "Kerama Marazzi",
-    surfaceType: "Глянцевая",
-    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-    price: 82,
-    oldPrice: 99,
-    badge: "-17%",
-    href: "/product/2",
-  },
-  {
-    id: "2",
-    title: "Плитка светлая 60x60",
-    category: "Плитка · 60x60",
-    categoryValue: "60x60",
-    format: "60x60",
-    manufacturer: "Kerama Marazzi",
-    surfaceType: "Глянцевая",
-    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-    price: 82,
-    oldPrice: 99,
-    badge: "-17%",
-    href: "/product/2",
-  },
-  {
-    id: "2",
-    title: "Плитка светлая 60x60",
-    category: "Плитка · 60x60",
-    categoryValue: "60x60",
-    format: "60x60",
-    manufacturer: "Kerama Marazzi",
-    surfaceType: "Глянцевая",
-    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-    price: 82,
-    oldPrice: 99,
-    badge: "-17%",
-    href: "/product/2",
-  },
-  {
-    id: "2",
-    title: "Плитка светлая 60x60",
-    category: "Плитка · 60x60",
-    categoryValue: "60x60",
-    format: "60x60",
-    manufacturer: "Kerama Marazzi",
-    surfaceType: "Глянцевая",
-    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-    price: 82,
-    oldPrice: 99,
-    badge: "-17%",
-    href: "/product/2",
-  },
-  {
-    id: "2",
-    title: "Плитка светлая 60x60",
-    category: "Плитка · 60x60",
-    categoryValue: "60x60",
-    format: "60x60",
-    manufacturer: "Kerama Marazzi",
-    surfaceType: "Глянцевая",
-    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-    price: 82,
-    oldPrice: 99,
-    badge: "-17%",
-    href: "/product/2",
+    manufacturer: "Paradyz",
+    formats: ["80x80"],
+    surfaceTypes: ["Лаппатированная"],
+    isNew: true,
+    isSale: true,
+    discountPercent: 20,
   },
   {
     id: "3",
-    title: "Плитка под мрамор 80x80",
-    category: "Плитка · 80x80",
-    categoryValue: "80x80",
-    format: "80x80",
-    manufacturer: "Paradyz",
-    surfaceType: "Лаппатированная",
+    title: "Керамогранит серый 60x60",
+    category: "Керамогранит · 60x60",
+    categoryValue: "60x60",
     image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-    price: 79,
-    oldPrice: 105,
-    badge: "-25%",
+    price: 69,
     href: "/product/3",
+    manufacturer: "Cersanit",
+    formats: ["60x60"],
+    surfaceTypes: ["Матовая"],
+    isNew: true,
   },
   {
     id: "4",
-    title: "Керамогранит 100x100",
-    category: "Плитка · 100x100",
-    categoryValue: "100x100",
-    format: "100x100",
-    manufacturer: "Cersanit",
-    surfaceType: "Матовая",
+    title: "Керамогранит бетон 120x60",
+    category: "Керамогранит · 120x60",
+    categoryValue: "120x60",
     image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-    price: 110,
+    price: 91,
     href: "/product/4",
+    manufacturer: "Cersanit",
+    formats: ["120x60"],
+    surfaceTypes: ["Матовая"],
   },
   {
     id: "5",
-    title: "Керамогранит бежевый 120x60",
-    category: "Плитка · 120x60",
-    categoryValue: "120x60",
-    format: "120x60",
-    manufacturer: "Kerama Marazzi",
-    surfaceType: "Глянцевая",
+    title: "Керамогранит 120x20",
+    category: "Керамогранит · 120x20",
+    categoryValue: "120x20",
     image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-    price: 95,
-    oldPrice: 119,
-    badge: "-20%",
+    price: 88,
     href: "/product/5",
+    manufacturer: "Kerama Marazzi",
+    formats: ["120x20"],
+    surfaceTypes: ["Структурная"],
+    isNew: true,
   },
   {
     id: "6",
-    title: "Клей для плитки усиленный",
-    category: "Сопутствующие товары · Клей",
-    categoryValue: "glue",
-    manufacturer: "Ceresit",
+    title: "Керамогранит 160x80",
+    category: "Керамогранит · 160x80",
+    categoryValue: "160x80",
     image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-    price: 25,
+    price: 125,
     href: "/product/6",
+    manufacturer: "Paradyz",
+    formats: ["160x80"],
+    surfaceTypes: ["Матовая", "Глянцевая"],
   },
   {
     id: "7",
-    title: "Герметик санитарный",
-    category: "Сопутствующие товары · Герметик",
-    categoryValue: "sealant",
-    manufacturer: "Soudal",
+    title: "Керамическая плитка настенная",
+    category: "Керамическая плитка",
+    categoryValue: "ceramic-tile",
     image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-    price: 14,
+    price: 55,
     href: "/product/7",
+    manufacturer: "Cersanit",
+    formats: ["30x60"],
+    surfaceTypes: ["Глянцевая"],
+    isNew: true,
   },
   {
     id: "8",
-    title: "Фуга влагостойкая",
-    category: "Сопутствующие товары · Фуга",
+    title: "Строительная смесь для плитки",
+    category: "Сопутствующие товары · Строительные смеси",
+    categoryValue: "mixes",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+    price: 25,
+    href: "/product/8",
+    manufacturer: "Ceresit",
+  },
+  {
+    id: "9",
+    title: "Затирка влагостойкая",
+    category: "Сопутствующие товары · Затирка",
     categoryValue: "grout",
-    manufacturer: "Mapei",
     image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
     price: 18,
-    href: "/product/8",
+    oldPrice: 24,
+    href: "/product/9",
+    manufacturer: "Mapei",
+    isSale: true,
+    discountPercent: 25,
+  },
+  {
+    id: "10",
+    title: "Силикон санитарный",
+    category: "Сопутствующие товары · Силикон",
+    categoryValue: "silicone",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+    price: 14,
+    href: "/product/10",
+    manufacturer: "Soudal",
+  },
+  {
+    id: "11",
+    title: "Инструменты и прочие товары",
+    category: "Сопутствующие товары · Прочее",
+    categoryValue: "other",
+    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+    price: 12,
+    href: "/product/11",
+    manufacturer: "Other",
   },
 ]
 
@@ -234,16 +192,25 @@ const initialFilters: CatalogFilters = {
   surfaceTypes: [],
 }
 
-const defaultCategory = "60x60"
+const tileCategories = [
+  "60x60",
+  "80x80",
+  "120x60",
+  "120x20",
+  "160x80",
+  "ceramic-tile",
+]
+
+const accessoryCategories = ["mixes", "grout", "silicone", "other"]
 
 const CatalogContainer = () => {
-  const { section } = useParams()
+  const { type, section } = useParams()
 
-  const activeCategory = section ?? defaultCategory
+  const activeCategory = section ?? type ?? "tiles"
 
+  const [filters, setFilters] = useState<CatalogFilters>(initialFilters)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [isSectionsOpen, setIsSectionsOpen] = useState(false)
-  const [filters, setFilters] = useState<CatalogFilters>(initialFilters)
 
   const activeItem = useMemo(() => {
     return catalogGroups
@@ -252,9 +219,12 @@ const CatalogContainer = () => {
   }, [activeCategory])
 
   const activeGroup = useMemo(() => {
-    return catalogGroups.find((group) =>
-      group.items.some((item) => item.value === activeCategory)
-    )
+    return catalogGroups.find((group) => {
+      return (
+        group.value === activeCategory ||
+        group.items.some((item) => item.value === activeCategory)
+      )
+    })
   }, [activeCategory])
 
   const filteredProducts = useMemo(() => {
@@ -262,10 +232,16 @@ const CatalogContainer = () => {
       const priceFrom = Number(filters.priceFrom || 0)
       const priceTo = Number(filters.priceTo || Infinity)
 
-      const matchesCategory = product.categoryValue === activeCategory
+      const matchesCategory =
+        activeCategory === "tiles"
+          ? tileCategories.includes(product.categoryValue)
+          : activeCategory === "accessories"
+            ? accessoryCategories.includes(product.categoryValue)
+            : activeCategory === "sale"
+              ? product.isSale === true
+              : product.categoryValue === activeCategory
 
-      const matchesPrice =
-        product.price >= priceFrom && product.price <= priceTo
+      const matchesPrice = product.price >= priceFrom && product.price <= priceTo
 
       const matchesManufacturer =
         filters.manufacturers.length === 0 ||
@@ -273,11 +249,13 @@ const CatalogContainer = () => {
 
       const matchesFormat =
         filters.formats.length === 0 ||
-        filters.formats.includes(product.format ?? "")
+        product.formats?.some((format) => filters.formats.includes(format))
 
       const matchesSurface =
         filters.surfaceTypes.length === 0 ||
-        filters.surfaceTypes.includes(product.surfaceType ?? "")
+        product.surfaceTypes?.some((surface) =>
+          filters.surfaceTypes.includes(surface)
+        )
 
       return (
         matchesCategory &&
@@ -289,12 +267,16 @@ const CatalogContainer = () => {
     })
   }, [activeCategory, filters])
 
-  const title = activeItem?.label ?? "Каталог"
+  const title = activeItem?.label ?? activeGroup?.title ?? "Каталог"
 
   const description =
-    activeGroup?.title === "Плитка"
-      ? "Выберите плитку нужного формата. Используйте фильтр, чтобы быстрее найти подходящий вариант по цене, производителю и типу поверхности."
-      : "Сопутствующие товары для укладки и ухода за плиткой. Используйте фильтр, чтобы подобрать нужный товар по цене и производителю."
+    activeCategory === "sale"
+      ? "Товары со скидками и выгодными предложениями. Используйте фильтр, чтобы быстрее найти подходящий вариант."
+      : activeGroup?.value === "tiles"
+        ? "Выберите плитку нужного формата. Используйте фильтр, чтобы быстрее найти подходящий вариант."
+        : activeGroup?.value === "accessories"
+          ? "Сопутствующие товары для укладки и ухода за плиткой."
+          : "Выберите нужный товар из каталога."
 
   return (
     <CatalogView
