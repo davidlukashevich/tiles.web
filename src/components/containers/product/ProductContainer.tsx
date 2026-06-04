@@ -1,6 +1,10 @@
-import { useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router-dom"
 import ProductView from "../../ui/product/Product"
+import {
+  isFavorite,
+  toggleFavorite,
+} from "../../../helpers/Favorite/favorite"
 
 const products = [
   {
@@ -16,8 +20,6 @@ const products = [
     oldPrice: null,
     image:
       "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-    description:
-      "Практичный керамогранит в спокойном сером оттенке. Подходит для ванной, кухни, прихожей и коммерческих помещений.",
     characteristics: [
       { label: "Размер", value: "60x60 см" },
       { label: "Поверхность", value: "Матовая" },
@@ -40,8 +42,6 @@ const products = [
     oldPrice: 99,
     image:
       "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-    description:
-      "Светлый керамогранит с универсальным дизайном. Хорошо подходит для современных интерьеров.",
     characteristics: [
       { label: "Размер", value: "60x60 см, 120x60 см" },
       { label: "Поверхность", value: "Глянцевая, Лаппатированная" },
@@ -54,13 +54,59 @@ const products = [
 ]
 
 const ProductContainer = () => {
+  const [isRequestOpen, setIsRequestOpen] = useState(false)
+  const [favorite, setFavorite] = useState(false)
+
   const { id } = useParams()
 
   const product = useMemo(() => {
     return products.find((item) => item.id === id)
   }, [id])
 
-  return <ProductView product={product} />
+  useEffect(() => {
+    if (!product) return
+
+    setFavorite(isFavorite(product.id))
+
+    const handleFavoritesChanged = () => {
+      setFavorite(isFavorite(product.id))
+    }
+
+    window.addEventListener("favorites:changed", handleFavoritesChanged)
+    window.addEventListener("storage", handleFavoritesChanged)
+
+    return () => {
+      window.removeEventListener("favorites:changed", handleFavoritesChanged)
+      window.removeEventListener("storage", handleFavoritesChanged)
+    }
+  }, [product])
+
+  const handleToggleFavorite = () => {
+    if (!product) return
+
+    const nextState = toggleFavorite({
+      id: product.id,
+      title: product.title,
+      category: product.category,
+      image: product.image,
+      price: product.price,
+      oldPrice: product.oldPrice ?? undefined,
+      href: `/product/${product.id}`,
+    })
+
+    setFavorite(nextState)
+  }
+
+  return (
+    <ProductView
+      product={product}
+      isRequestOpen={isRequestOpen}
+      isFavorite={favorite}
+      onOpenRequest={() => setIsRequestOpen(true)}
+      onCloseRequest={() => setIsRequestOpen(false)}
+      onToggleFavorite={handleToggleFavorite}
+    />
+  )
 }
 
 export default ProductContainer

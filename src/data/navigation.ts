@@ -1,5 +1,6 @@
 import viber from "../assets/viber.jpeg"
 import kufar from "../assets/kufar.jpeg"
+import telegram from "../assets/telegram.png"
 
 export type NavLinkItem = {
   label: string
@@ -138,6 +139,7 @@ export const navigation: NavItem[] = [
 export const socialLinks: SocialLink[] = [
   { label: "Viber", href: "https://viber.com", img: viber },
   { label: "Kufar", href: "https://kufar.by", img: kufar },
+  { label: "Telegram", href: "https://web.telegram.org/", img: telegram },
 ]
 
 export const companyInfo = {

@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import CatalogFilterModal from "./CatalogFilterModal"
 import CatalogProductCard from "./CatalogProductCard"
 import CatalogSidebar from "./CatalogSidebar"
@@ -6,11 +7,11 @@ import type {
   CatalogGroup,
   CatalogProduct,
 } from "../../../types/ui/Catalog.type"
-import { useEffect } from "react"
 
 type Props = {
   groups: CatalogGroup[]
   products: CatalogProduct[]
+  favoriteIds: string[]
   activeCategory: string
   title: string
   description: string
@@ -24,11 +25,16 @@ type Props = {
   onChangeFilters: (filters: CatalogFilters) => void
   onResetFilters: () => void
   onApplyFilters: () => void
+  onToggleFavorite: (
+    event: React.MouseEvent<HTMLButtonElement>,
+    product: CatalogProduct
+  ) => void
 }
 
 const CatalogView = ({
   groups,
   products,
+  favoriteIds,
   activeCategory,
   title,
   description,
@@ -42,14 +48,10 @@ const CatalogView = ({
   onChangeFilters,
   onResetFilters,
   onApplyFilters,
+  onToggleFavorite,
 }: Props) => {
-
   useEffect(() => {
-    if (isFilterOpen) {
-      document.body.style.overflow = "hidden"
-    } else {
-      document.body.style.overflow = ""
-    }
+    document.body.style.overflow = isFilterOpen ? "hidden" : ""
 
     return () => {
       document.body.style.overflow = ""
@@ -111,7 +113,12 @@ const CatalogView = ({
             {products.length > 0 ? (
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 2xl:grid-cols-3">
                 {products.map((product) => (
-                  <CatalogProductCard key={product.id} product={product} />
+                  <CatalogProductCard
+                    key={product.id}
+                    product={product}
+                    isFavorite={favoriteIds.includes(product.id)}
+                    onToggleFavorite={onToggleFavorite}
+                  />
                 ))}
               </div>
             ) : (

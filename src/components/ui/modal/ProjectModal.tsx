@@ -22,7 +22,7 @@ const ProjectModal = ({ isOpen, onClose }: Props) => {
             <button
                 type="button"
                 onClick={onClose}
-                className="absolute inset-0 cursor-pointer bg-black/40"
+                className="absolute inset-0 cursor-pointer bg-black/45 backdrop-blur-[2px]"
                 aria-label="Закрыть"
             />
 
@@ -30,7 +30,7 @@ const ProjectModal = ({ isOpen, onClose }: Props) => {
                 <button
                     type="button"
                     onClick={onClose}
-                    className="absolute right-6 top-6 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-[#f3f1ec] text-neutral-900 transition hover:bg-black hover:text-white"
+                    className="absolute right-6 top-6 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-[#f3f1ec] text-neutral-900 transition-all duration-200 hover:scale-105 hover:bg-black hover:text-white"
                     aria-label="Закрыть"
                 >
                     <IoIosClose className="h-7 w-7" />
@@ -51,7 +51,8 @@ const ProjectModal = ({ isOpen, onClose }: Props) => {
 
                         <input
                             type="text"
-                            className="h-12 rounded-[16px] border border-black/10 px-4 text-sm outline-none transition focus:border-black"
+                            placeholder="Введите имя"
+                            className="h-12 rounded-[16px] border border-black/10 px-4 text-sm outline-none transition placeholder:text-neutral-400 focus:border-black"
                         />
                     </label>
 

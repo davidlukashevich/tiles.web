@@ -9,7 +9,6 @@ export type SaleItem = {
   oldPrice?: string
 
   isSale?: boolean
-  discountPercent?: number
 }
 
 export type SaleProduct = {
@@ -19,6 +18,5 @@ export type SaleProduct = {
   category: string
   oldPrice: number
   price: number
-  discount: string
   image: string
 }

@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom"
 
 const AboutUs = () => {
     return (
-        <section className="px-4 md:px-6 xl:px-8">
+        <section className="px-4 pb-10 md:px-6 xl:px-8">
             <div className="mx-auto max-w-[1280px]">
                 <div className="relative overflow-hidden rounded-2xl bg-[#f3f1ec] p-6 md:p-10 lg:p-14">
                     <div className="pointer-events-none absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-black/20 to-transparent" />

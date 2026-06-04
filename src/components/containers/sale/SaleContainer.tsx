@@ -9,7 +9,6 @@ const saleProducts = [
         category: "Плитка",
         oldPrice: 89,
         price: 69,
-        discount: "-22%",
         image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
     },
     {
@@ -19,7 +18,6 @@ const saleProducts = [
         category: "Плитка",
         oldPrice: 119,
         price: 95,
-        discount: "-20%",
         image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
     },
     {
@@ -29,7 +27,6 @@ const saleProducts = [
         category: "Плитка",
         oldPrice: 105,
         price: 79,
-        discount: "-25%",
         image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
     },
 ]

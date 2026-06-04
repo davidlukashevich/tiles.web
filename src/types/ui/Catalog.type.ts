@@ -27,7 +27,6 @@ export type CatalogProduct = {
 
   isNew?: boolean
   isSale?: boolean
-  discountPercent?: number
 }
 
 export type CatalogFilters = {

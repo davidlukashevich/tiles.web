@@ -13,6 +13,9 @@ export default function HeaderContainer() {
   const [openSection, setOpenSection] = useState<string | null>(null)
   const [projectModalOpen, setProjectModalOpen] = useState(false)
 
+  const [favoritesOpen, setFavoritesOpen] = useState(false)
+  const [favoritesCount, setFavoritesCount] = useState(0)
+
   const handleOpenMobileMenu = () => {
     setMobileMenuOpen(true)
   }
@@ -65,8 +68,13 @@ export default function HeaderContainer() {
       navigation={navigation}
       socialLinks={socialLinks}
       projectModalOpen={projectModalOpen}
+      favoritesOpen={favoritesOpen}
+      favoritesCount={favoritesCount}
       onOpenProjectModal={() => setProjectModalOpen(true)}
       onCloseProjectModal={() => setProjectModalOpen(false)}
+      onOpenFavorites={() => setFavoritesOpen(true)}
+      onCloseFavorites={() => setFavoritesOpen(false)}
+      onChangeFavoritesCount={setFavoritesCount}
       onOpenMobileMenu={handleOpenMobileMenu}
       onCloseMobileMenu={handleCloseMobileMenu}
       onToggleSection={handleToggleSection}

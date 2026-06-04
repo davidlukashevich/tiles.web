@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useParams } from "react-router-dom"
 import CatalogView from "../../ui/catalog/CatalogView"
 import type {
@@ -6,6 +6,10 @@ import type {
   CatalogGroup,
   CatalogProduct,
 } from "../../../types/ui/Catalog.type"
+import {
+  getFavorites,
+  toggleFavorite,
+} from "../../../helpers/Favorite/favorite"
 
 const catalogGroups: CatalogGroup[] = [
   {
@@ -30,10 +34,26 @@ const catalogGroups: CatalogGroup[] = [
     value: "accessories",
     href: "/catalog/accessories",
     items: [
-      { label: "Строительные смеси", value: "mixes", href: "/catalog/accessories/mixes" },
-      { label: "Затирка", value: "grout", href: "/catalog/accessories/grout" },
-      { label: "Силикон", value: "silicone", href: "/catalog/accessories/silicone" },
-      { label: "Прочее", value: "other", href: "/catalog/accessories/other" },
+      {
+        label: "Строительные смеси",
+        value: "mixes",
+        href: "/catalog/accessories/mixes",
+      },
+      {
+        label: "Затирка",
+        value: "grout",
+        href: "/catalog/accessories/grout",
+      },
+      {
+        label: "Силикон",
+        value: "silicone",
+        href: "/catalog/accessories/silicone",
+      },
+      {
+        label: "Прочее",
+        value: "other",
+        href: "/catalog/accessories/other",
+      },
     ],
   },
   {
@@ -50,7 +70,8 @@ const products: CatalogProduct[] = [
     title: "Керамогранит светлый 60x60",
     category: "Керамогранит · 60x60",
     categoryValue: "60x60",
-    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+    image:
+      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
     price: 82,
     oldPrice: 99,
     href: "/product/1",
@@ -58,14 +79,14 @@ const products: CatalogProduct[] = [
     formats: ["60x60", "120x60"],
     surfaceTypes: ["Глянцевая", "Лаппатированная"],
     isSale: true,
-    discountPercent: 17,
   },
   {
     id: "2",
     title: "Керамогранит под мрамор 80x80",
     category: "Керамогранит · 80x80",
     categoryValue: "80x80",
-    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+    image:
+      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
     price: 79,
     oldPrice: 95,
     href: "/product/2",
@@ -74,14 +95,14 @@ const products: CatalogProduct[] = [
     surfaceTypes: ["Лаппатированная"],
     isNew: true,
     isSale: true,
-    discountPercent: 20,
   },
   {
     id: "3",
     title: "Керамогранит серый 60x60",
     category: "Керамогранит · 60x60",
     categoryValue: "60x60",
-    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+    image:
+      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
     price: 69,
     href: "/product/3",
     manufacturer: "Cersanit",
@@ -94,7 +115,8 @@ const products: CatalogProduct[] = [
     title: "Керамогранит бетон 120x60",
     category: "Керамогранит · 120x60",
     categoryValue: "120x60",
-    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+    image:
+      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
     price: 91,
     href: "/product/4",
     manufacturer: "Cersanit",
@@ -106,7 +128,8 @@ const products: CatalogProduct[] = [
     title: "Керамогранит 120x20",
     category: "Керамогранит · 120x20",
     categoryValue: "120x20",
-    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+    image:
+      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
     price: 88,
     href: "/product/5",
     manufacturer: "Kerama Marazzi",
@@ -119,7 +142,8 @@ const products: CatalogProduct[] = [
     title: "Керамогранит 160x80",
     category: "Керамогранит · 160x80",
     categoryValue: "160x80",
-    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+    image:
+      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
     price: 125,
     href: "/product/6",
     manufacturer: "Paradyz",
@@ -131,7 +155,8 @@ const products: CatalogProduct[] = [
     title: "Керамическая плитка настенная",
     category: "Керамическая плитка",
     categoryValue: "ceramic-tile",
-    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+    image:
+      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
     price: 55,
     href: "/product/7",
     manufacturer: "Cersanit",
@@ -144,7 +169,8 @@ const products: CatalogProduct[] = [
     title: "Строительная смесь для плитки",
     category: "Сопутствующие товары · Строительные смеси",
     categoryValue: "mixes",
-    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+    image:
+      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
     price: 25,
     href: "/product/8",
     manufacturer: "Ceresit",
@@ -154,20 +180,21 @@ const products: CatalogProduct[] = [
     title: "Затирка влагостойкая",
     category: "Сопутствующие товары · Затирка",
     categoryValue: "grout",
-    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+    image:
+      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
     price: 18,
     oldPrice: 24,
     href: "/product/9",
     manufacturer: "Mapei",
     isSale: true,
-    discountPercent: 25,
   },
   {
     id: "10",
     title: "Силикон санитарный",
     category: "Сопутствующие товары · Силикон",
     categoryValue: "silicone",
-    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+    image:
+      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
     price: 14,
     href: "/product/10",
     manufacturer: "Soudal",
@@ -177,7 +204,8 @@ const products: CatalogProduct[] = [
     title: "Инструменты и прочие товары",
     category: "Сопутствующие товары · Прочее",
     categoryValue: "other",
-    image: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+    image:
+      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
     price: 12,
     href: "/product/11",
     manufacturer: "Other",
@@ -211,6 +239,23 @@ const CatalogContainer = () => {
   const [filters, setFilters] = useState<CatalogFilters>(initialFilters)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [isSectionsOpen, setIsSectionsOpen] = useState(false)
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([])
+
+  useEffect(() => {
+    const syncFavorites = () => {
+      setFavoriteIds(getFavorites().map((item) => item.id))
+    }
+
+    syncFavorites()
+
+    window.addEventListener("favorites:changed", syncFavorites)
+    window.addEventListener("storage", syncFavorites)
+
+    return () => {
+      window.removeEventListener("favorites:changed", syncFavorites)
+      window.removeEventListener("storage", syncFavorites)
+    }
+  }, [])
 
   const activeItem = useMemo(() => {
     return catalogGroups
@@ -267,6 +312,26 @@ const CatalogContainer = () => {
     })
   }, [activeCategory, filters])
 
+  const handleToggleFavorite = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    product: CatalogProduct
+  ) => {
+    event.preventDefault()
+    event.stopPropagation()
+
+    toggleFavorite({
+      id: product.id,
+      title: product.title,
+      category: product.category,
+      image: product.image,
+      price: product.price,
+      oldPrice: product.oldPrice,
+      href: product.href,
+    })
+
+    setFavoriteIds(getFavorites().map((item) => item.id))
+  }
+
   const title = activeItem?.label ?? activeGroup?.title ?? "Каталог"
 
   const description =
@@ -282,6 +347,7 @@ const CatalogContainer = () => {
     <CatalogView
       groups={catalogGroups}
       products={filteredProducts}
+      favoriteIds={favoriteIds}
       activeCategory={activeCategory}
       title={title}
       description={description}
@@ -295,6 +361,7 @@ const CatalogContainer = () => {
       onChangeFilters={setFilters}
       onResetFilters={() => setFilters(initialFilters)}
       onApplyFilters={() => setIsFilterOpen(false)}
+      onToggleFavorite={handleToggleFavorite}
     />
   )
 }

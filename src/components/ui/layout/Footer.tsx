@@ -46,7 +46,7 @@ export default function Footer({
   return (
     <footer className="bg-[#292625] px-4 py-14 text-white md:px-6 xl:px-8">
       <div className="mx-auto max-w-[1280px]">
-        <div className="grid gap-10 lg:grid-cols-[260px_1fr]">
+        <div className="grid gap-10 xl:grid-cols-[260px_1fr]">
           <div>
             <NavLink to="/" className="flex items-start gap-4">
               <img
@@ -69,10 +69,13 @@ export default function Footer({
             </NavLink>
           </div>
 
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             <FooterColumn title="Плитка" links={tileLinks} />
 
-            <FooterColumn title="Сопутствующие товары" links={accessoriesLinks} />
+            <FooterColumn
+              title="Сопутствующие товары"
+              links={accessoriesLinks}
+            />
 
             <FooterColumn title="Подборка" links={selectionLinks} />
 
@@ -112,7 +115,7 @@ export default function Footer({
                 ))}
               </div>
 
-              <ul className="mt-6 flex items-center gap-3">
+              <ul className="mt-6 flex flex-wrap items-center gap-3">
                 {socialLinks.map((item) => (
                   <li key={item.label}>
                     <a
