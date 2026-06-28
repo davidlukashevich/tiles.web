@@ -7,14 +7,17 @@ import {
   socialLinks,
 } from "../../../data/navigation"
 import { toggleSectionValue } from "../../../helpers/Header/toggleSectionValue"
+import { useCategories } from "../../../hooks/useCategories"
+import { buildNavigation } from "../../../helpers/Header/buildNavigation"
 
 export default function HeaderContainer() {
+  const { data } = useCategories()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [openSection, setOpenSection] = useState<string | null>(null)
   const [projectModalOpen, setProjectModalOpen] = useState(false)
-
   const [favoritesOpen, setFavoritesOpen] = useState(false)
   const [favoritesCount, setFavoritesCount] = useState(0)
+  const menuNavigation = buildNavigation(navigation, data)
 
   const handleOpenMobileMenu = () => {
     setMobileMenuOpen(true)
@@ -65,7 +68,7 @@ export default function HeaderContainer() {
       phoneHref={companyInfo.phoneHref}
       mobileMenuOpen={mobileMenuOpen}
       openSection={openSection}
-      navigation={navigation}
+      navigation={menuNavigation}
       socialLinks={socialLinks}
       projectModalOpen={projectModalOpen}
       favoritesOpen={favoritesOpen}

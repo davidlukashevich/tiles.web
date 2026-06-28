@@ -5,9 +5,14 @@ import {
   navigation,
   socialLinks,
 } from "../../../data/navigation"
+import { buildNavigation } from "../../../helpers/Header/buildNavigation"
+import { useCategories } from "../../../hooks/useCategories"
 import Footer from "../../ui/layout/Footer"
 
 export default function FooterContainer() {
+  const { data } = useCategories()
+  const menuNavigation = buildNavigation(navigation, data)
+
   return (
     <Footer
       logoSrc={logo}
@@ -17,7 +22,7 @@ export default function FooterContainer() {
       phoneHref={companyInfo.phoneHref}
       workTime={companyInfo.workTime}
       addressLines={companyInfo.addressLines}
-      navigation={navigation}
+      navigation={menuNavigation}
       socialLinks={socialLinks}
       legalLinks={footerLinks.legal}
       copyright={companyInfo.copyright}

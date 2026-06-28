@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
-import type { SaleItem } from "../../../types/ui/Sale.type"
-import SaleCategories from "../../ui/home/SaleCategories"
 import {
   getFavorites,
   toggleFavorite,
 } from "../../../helpers/Favorite/favorite"
+import type { SaleItem } from "../../../types/ui/Sale.type"
+import SaleCategories from "../../ui/home/SaleCategories"
 
 const SaleCategoriesContainer = () => {
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])

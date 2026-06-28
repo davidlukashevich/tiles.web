@@ -47,12 +47,12 @@ export const navigation: NavItem[] = [
         label: "Керамогранит",
         href: "/catalog/tiles",
         children: [
-          { label: "60x60", href: "/catalog/tiles/60x60" },
-          { label: "80x80", href: "/catalog/tiles/80x80" },
-          { label: "120x60", href: "/catalog/tiles/120x60" },
-          { label: "120x20", href: "/catalog/tiles/120x20" },
-          { label: "160x80", href: "/catalog/tiles/160x80" },
-          { label: "Керамическая Плитка", href: "/catalog/ceramic-tile" },
+          // { label: "60x60", href: "/catalog/tiles/60x60" },
+          // { label: "80x80", href: "/catalog/tiles/80x80" },
+          // { label: "120x60", href: "/catalog/tiles/120x60" },
+          // { label: "120x20", href: "/catalog/tiles/120x20" },
+          // { label: "160x80", href: "/catalog/tiles/160x80" },
+          // { label: "Керамическая Плитка", href: "/catalog/ceramic-tile" },
         ],
       },
       {

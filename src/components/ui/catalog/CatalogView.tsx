@@ -2,15 +2,17 @@ import { useEffect } from "react"
 import CatalogFilterModal from "./CatalogFilterModal"
 import CatalogProductCard from "./CatalogProductCard"
 import CatalogSidebar from "./CatalogSidebar"
+
 import type {
   CatalogFilters,
   CatalogGroup,
-  CatalogProduct,
 } from "../../../types/ui/Catalog.type"
+
+import type { ProductWithImage } from "../../../types/response/Product.type"
 
 type Props = {
   groups: CatalogGroup[]
-  products: CatalogProduct[]
+  products: ProductWithImage[]
   favoriteIds: string[]
   activeCategory: string
   title: string
@@ -27,7 +29,7 @@ type Props = {
   onApplyFilters: () => void
   onToggleFavorite: (
     event: React.MouseEvent<HTMLButtonElement>,
-    product: CatalogProduct
+    product: ProductWithImage,
   ) => void
 }
 

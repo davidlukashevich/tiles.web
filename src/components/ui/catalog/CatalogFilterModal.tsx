@@ -12,19 +12,31 @@ type Props = {
 }
 
 const manufacturers = [
-  "Kerama Marazzi",
-  "Cersanit",
-  "Paradyz",
-  "Ceresit",
-  "Soudal",
-  "Mapei",
+  "LAPARET",
+  "KERAMA MARAZZI",
+  "Грани Таганая",
+  "ESTIMA",
+  "PRIMAVERA",
+  "BYTTERFLY",
+  "IDALGO",
+  "GRANITEA",
+  "УРАЛЬСКИЙ ГРАНИТ",
+  "CERSANIT",
+  "CERADIM",
+  "КЕРАМИН",
 ]
 
 const surfaceTypes = [
   "Матовая",
+  "Полированная",
   "Глянцевая",
-  "Лаппатированная",
   "Структурная",
+  "Лаппатированная",
+  "Сатинированная",
+  "Карвинг",
+  "Вельвет",
+  "Sugar",
+  "Металлик",
 ]
 
 const toggleValue = (list: string[], value: string) => {
