@@ -5,7 +5,7 @@ import DesktopMenu from "./DesktopMenu"
 import MobileMenu from "./MobileMenu"
 import { FaHeart, FaPhone } from "react-icons/fa6"
 import { NavLink } from "react-router-dom"
-import ProjectModal from "../../modal/ProjectModal"
+import ProjectModalContainer from "../../../containers/layout/ProjectModalContainer"
 import FavoritesContainer from "../../../containers/favorites/FavoritesContainer"
 
 export type HeaderProps = {
@@ -197,7 +197,7 @@ export default function Header({
         />
       )}
 
-      <ProjectModal
+      <ProjectModalContainer
         isOpen={projectModalOpen}
         onClose={onCloseProjectModal}
       />

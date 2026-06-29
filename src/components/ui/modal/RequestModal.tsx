@@ -1,5 +1,6 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { IoIosClose } from "react-icons/io"
+import ConsentCheckboxes from "../form/ConsentCheckboxes"
 
 type Props = {
     isOpen: boolean
@@ -7,6 +8,8 @@ type Props = {
 }
 
 const RequestModal = ({ isOpen, onClose }: Props) => {
+    const [consentValid, setConsentValid] = useState(false)
+
     useEffect(() => {
         document.body.style.overflow = isOpen ? "hidden" : ""
 
@@ -91,18 +94,17 @@ const RequestModal = ({ isOpen, onClose }: Props) => {
                         />
                     </label>
 
+                    {/* CONSENTS */}
+                    <ConsentCheckboxes onValidityChange={setConsentValid} />
+
                     {/* BUTTON */}
                     <button
                         type="submit"
-                        className="mt-2 flex h-14 cursor-pointer items-center justify-center rounded-[18px] bg-black px-5 text-[13px] font-semibold uppercase tracking-[0.08em] text-white transition-all duration-200 hover:opacity-85"
+                        disabled={!consentValid}
+                        className="mt-2 flex h-14 items-center justify-center rounded-[18px] bg-black px-5 text-[13px] font-semibold uppercase tracking-[0.08em] text-white transition-all duration-200 hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-40 enabled:cursor-pointer"
                     >
                         Отправить заявку
                     </button>
-
-                    {/* POLICY */}
-                    <p className="text-center text-xs leading-6 text-neutral-400">
-                        Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности
-                    </p>
                 </form>
             </div>
         </div>
