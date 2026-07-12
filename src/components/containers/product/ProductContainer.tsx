@@ -5,63 +5,129 @@ import {
   isFavorite,
   toggleFavorite,
 } from "../../../helpers/Favorite/favorite"
-
-const products = [
-  {
-    id: "1",
-    title: "Керамогранит серый 60x60",
-    category: "Керамогранит",
-    collection: "Urban Stone",
-    size: "60x60",
-    surface: "Матовая",
-    manufacturer: "Cersanit",
-    country: "Польша",
-    price: 69,
-    oldPrice: null,
-    image:
-      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-    characteristics: [
-      { label: "Размер", value: "60x60 см" },
-      { label: "Поверхность", value: "Матовая" },
-      { label: "Производитель", value: "Cersanit" },
-      { label: "Страна", value: "Польша" },
-      { label: "Назначение", value: "Пол / стены" },
-      { label: "Износостойкость", value: "PEI IV" },
-    ],
-  },
-  {
-    id: "2",
-    title: "Керамогранит светлый 60x60",
-    category: "Керамогранит",
-    collection: "Light Stone",
-    size: "60x60, 120x60",
-    surface: "Глянцевая, Лаппатированная",
-    manufacturer: "Kerama Marazzi",
-    country: "Россия",
-    price: 82,
-    oldPrice: 99,
-    image:
-      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-    characteristics: [
-      { label: "Размер", value: "60x60 см, 120x60 см" },
-      { label: "Поверхность", value: "Глянцевая, Лаппатированная" },
-      { label: "Производитель", value: "Kerama Marazzi" },
-      { label: "Страна", value: "Россия" },
-      { label: "Назначение", value: "Пол / стены" },
-      { label: "Тип", value: "Керамогранит" },
-    ],
-  },
-]
+import {
+  useProduct,
+  useProductImages,
+  useProductVariants,
+} from "../../../hooks/useProducts"
+import { productHrefBySlug } from "../../../helpers/slug"
+import { computeDisplayPrice, priceWithDiscount } from "../../../helpers/price"
 
 const ProductContainer = () => {
   const [isRequestOpen, setIsRequestOpen] = useState(false)
   const [favorite, setFavorite] = useState(false)
 
   const { id } = useParams()
+  const identifier = id ?? ""
 
-  const product = useMemo(() => {
-    return products.find((item) => item.id === id)
-  }, [id])
+  const { data: product = null, isLoading: isProductLoading } =
+    useProduct(identifier)
+
+  const productIds = useMemo(
+    () => (product ? [product.id] : []),
+    [product],
+  )
+
+  const { data: images = [], isLoading: isImagesLoading } =
+    useProductImages(productIds)
+  const { data: variants = [], isLoading: isVariantsLoading } =
+    useProductVariants(productIds)
+
+  const viewProduct = useMemo(() => {
+    if (!product) return undefined
+
+    const sizes = [
+      ...new Set(
+        variants
+          .map((variant) => variant.size_name)
+          .filter((size): size is string => Boolean(size)),
+      ),
+    ]
+    const surfaces = [
+      ...new Set(
+        variants
+          .map((variant) => variant.surface_name)
+          .filter((surface): surface is string => Boolean(surface)),
+      ),
+    ]
+
+    // Минимальная цена со скидкой + перечёркнутая исходная
+    const display = computeDisplayPrice(variants)
+    const price = display.price ?? product.price_from ?? 0
+    const oldPrice = display.oldPrice
+
+    const gallery = images.map((image) => image.image_url)
+
+    const characteristics: { label: string; value: string }[] = []
+    if (sizes.length)
+      characteristics.push({ label: "Размер", value: sizes.join(", ") })
+    if (surfaces.length)
+      characteristics.push({
+        label: "Поверхность",
+        value: surfaces.join(", "),
+      })
+    if (product.brand_name)
+      characteristics.push({
+        label: "Производитель",
+        value: product.brand_name,
+      })
+    if (product.country_name)
+      characteristics.push({ label: "Страна", value: product.country_name })
+    if (product.collection_name)
+      characteristics.push({
+        label: "Коллекция",
+        value: product.collection_name,
+      })
+    if (product.sort_name)
+      characteristics.push({ label: "Сорт", value: product.sort_name })
+    if (product.sku)
+      characteristics.push({ label: "Артикул", value: product.sku })
+
+    // Список вариантов: у каждого своя цена и флаги
+    const viewVariants = variants.map((variant) => {
+      const finalPrice = priceWithDiscount(
+        variant.price,
+        variant.discount_percent,
+      )
+      const hasDiscount =
+        variant.price != null &&
+        variant.discount_percent != null &&
+        Number(variant.discount_percent) > 0
+
+      return {
+        id: variant.id,
+        size: variant.size_name ?? "—",
+        surface: variant.surface_name ?? "—",
+        price: finalPrice,
+        oldPrice: hasDiscount ? Number(variant.price) : undefined,
+        discountPercent: hasDiscount ? Number(variant.discount_percent) : undefined,
+        isOnSale: variant.is_on_sale,
+        isRecommended: variant.is_recommended,
+      }
+    })
+
+    return {
+      id: product.id,
+      sku: product.sku,
+      title: product.name,
+      category: product.category_name,
+      collection: product.collection_name ?? "",
+      manufacturer: product.brand_name ?? undefined,
+      country: product.country_name ?? undefined,
+      price,
+      oldPrice,
+      priceIsFrom: display.isFrom,
+      image: gallery[0] ?? "",
+      images: gallery,
+      characteristics,
+      variants: viewVariants,
+      youtubeUrl: product.youtube_url,
+    }
+  }, [product, images, variants])
+
+  const isLoading =
+    isProductLoading ||
+    (productIds.length > 0 && (isImagesLoading || isVariantsLoading))
 
   useEffect(() => {
     if (!product) return
@@ -82,16 +148,16 @@ const ProductContainer = () => {
   }, [product])
 
   const handleToggleFavorite = () => {
-    if (!product) return
+    if (!viewProduct) return
 
     const nextState = toggleFavorite({
-      id: product.id,
-      title: product.title,
-      category: product.category,
-      image: product.image,
-      price: product.price,
-      oldPrice: product.oldPrice ?? undefined,
-      href: `/product/${product.id}`,
+      id: viewProduct.id,
+      title: viewProduct.title,
+      category: viewProduct.category,
+      image: viewProduct.image,
+      price: viewProduct.price,
+      oldPrice: viewProduct.oldPrice,
+      href: productHrefBySlug(viewProduct.title),
     })
 
     setFavorite(nextState)
@@ -99,7 +165,8 @@ const ProductContainer = () => {
 
   return (
     <ProductView
-      product={product}
+      product={viewProduct}
+      isLoading={isLoading}
       isRequestOpen={isRequestOpen}
       isFavorite={favorite}
       onOpenRequest={() => setIsRequestOpen(true)}

@@ -2,6 +2,7 @@ import { useState } from "react"
 import { NavLink } from "react-router-dom"
 import { FaHeart, FaRegImage } from "react-icons/fa6"
 import type { CatalogCardProduct } from "../../../types/response/Product.type"
+import { productHrefBySlug } from "../../../helpers/slug"
 
 type Props = {
   product: CatalogCardProduct
@@ -12,23 +13,12 @@ type Props = {
   ) => void
 }
 
-const getPriceText = (priceFrom: number | null, priceTo: number | null) => {
-  if (priceFrom === null && priceTo === null) return "Цена по запросу"
-
-  if (priceFrom !== null && priceTo !== null && priceFrom !== priceTo) {
-    return `от ${priceFrom} BYN`
-  }
-
-  return `${priceFrom ?? priceTo} BYN`
-}
-
 const CatalogProductCard = ({
   product,
   isFavorite,
   onToggleFavorite,
 }: Props) => {
-  const productHref = `/product/${product.sku}`
-  const priceText = getPriceText(product.price_from, product.price_to)
+  const productHref = productHrefBySlug(product.name)
 
   const [hasImageError, setHasImageError] = useState(false)
   const showImage = Boolean(product.image_url) && !hasImageError
@@ -74,6 +64,22 @@ const CatalogProductCard = ({
               <FaHeart className="h-4 w-4" />
             </div>
           </button>
+
+          {(product.isOnSale || product.isRecommended) && (
+            <div className="absolute bottom-3 right-3 z-10 flex flex-wrap justify-end gap-2">
+              {product.isOnSale && (
+                <span className="rounded-full bg-yellow-400 px-3 py-1 text-xs font-semibold text-white shadow-md">
+                  Распродажа
+                </span>
+              )}
+
+              {product.isRecommended && (
+                <span className="rounded-full bg-green-500 px-3 py-1 text-xs font-semibold text-white shadow-md">
+                  Новинка
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </NavLink>
 
@@ -88,8 +94,14 @@ const CatalogProductCard = ({
           </h3>
         </NavLink>
 
-        <p className="mb-3 min-h-[20px] text-sm text-neutral-500">
-          {product.brand_name ?? ""}
+        <p className="mb-3 min-h-[20px] flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-neutral-500">
+          {product.brand_name ? <span>{product.brand_name}</span> : null}
+
+          {product.brand_name && product.country_name ? (
+            <span className="text-neutral-300">|</span>
+          ) : null}
+
+          {product.country_name ? <span>{product.country_name}</span> : null}
         </p>
 
         <div className="flex min-h-[40px] flex-wrap items-start gap-x-2 gap-y-1 text-sm text-neutral-600">
@@ -97,17 +109,34 @@ const CatalogProductCard = ({
             <span>{product.sizes.join(", ")}</span>
           ) : null}
 
-          {product.sizes.length > 0 && product.country_name ? (
+          {product.sizes.length > 0 && product.surfaces.length > 0 ? (
             <span className="text-neutral-300">|</span>
           ) : null}
 
-          {product.country_name ? <span>{product.country_name}</span> : null}
+          {product.surfaces.length > 0 ? (
+            <span>{product.surfaces.join(", ")}</span>
+          ) : null}
         </div>
 
-        <div className="mt-auto mb-5 flex items-end gap-3 pt-5">
-          <p className="text-xl font-medium text-black sm:text-2xl">
-            {priceText}
-          </p>
+        <div className="mt-auto mb-5 flex flex-wrap items-end gap-x-3 gap-y-1 pt-5">
+          {product.displayPrice != null ? (
+            <>
+              <p className="text-xl font-medium text-black sm:text-2xl">
+                {product.priceIsFrom ? "от " : ""}
+                {product.displayPrice} BYN
+              </p>
+
+              {product.displayOldPrice ? (
+                <span className="pb-1 text-base text-gray-400 line-through">
+                  {product.displayOldPrice} BYN
+                </span>
+              ) : null}
+            </>
+          ) : (
+            <p className="text-xl font-medium text-black sm:text-2xl">
+              Цена по запросу
+            </p>
+          )}
         </div>
 
         <NavLink

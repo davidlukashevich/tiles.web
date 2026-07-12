@@ -49,7 +49,13 @@ export type ProductWithImage = Product & {
   image_url: string | null
 }
 
-// То, что реально показывает карточка каталога: товар + картинка + размеры
+// То, что реально показывает карточка каталога: товар + картинка + размеры + флаги
 export type CatalogCardProduct = ProductWithImage & {
   sizes: string[]
+  surfaces: string[]
+  isOnSale: boolean
+  isRecommended: boolean
+  displayPrice: number | null
+  displayOldPrice?: number
+  priceIsFrom: boolean
 }

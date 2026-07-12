@@ -49,5 +49,11 @@ export const buildCatalogGroups = (
         },
       ],
     },
+    {
+      title: "Распродажа",
+      value: "sale",
+      href: "/catalog/sale",
+      items: [],
+    },
   ]
 }

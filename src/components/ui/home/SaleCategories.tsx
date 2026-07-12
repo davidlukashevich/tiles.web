@@ -1,9 +1,10 @@
 import { NavLink } from "react-router-dom"
-import { FaHeart } from "react-icons/fa6"
+import { FaHeart, FaRegImage } from "react-icons/fa6"
 import type { SaleItem } from "../../../types/ui/Sale.type"
 
 type Props = {
   saleItems: SaleItem[]
+  isLoading: boolean
   favoriteIds: string[]
   onToggleFavorite: (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -11,8 +12,21 @@ type Props = {
   ) => void
 }
 
+const SaleCategorySkeleton = () => (
+  <div className="flex h-full animate-pulse flex-col overflow-hidden rounded-xl border-b border-black/10 bg-white">
+    <div className="h-40 w-full bg-gray-200" />
+    <div className="flex flex-1 flex-col p-4">
+      <div className="mb-2 h-3 w-1/3 rounded bg-gray-200" />
+      <div className="mb-3 h-6 w-4/5 rounded bg-gray-200" />
+      <div className="mb-4 h-4 w-2/3 rounded bg-gray-200" />
+      <div className="mt-auto h-6 w-1/3 rounded bg-gray-200 pt-5" />
+    </div>
+  </div>
+)
+
 const SaleCategories = ({
   saleItems,
+  isLoading,
   favoriteIds,
   onToggleFavorite,
 }: Props) => {
@@ -38,6 +52,13 @@ const SaleCategories = ({
           </NavLink>
         </div>
 
+        {isLoading ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <SaleCategorySkeleton key={index} />
+            ))}
+          </div>
+        ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {saleItems.map((item) => {
             const isFavorite = favoriteIds.includes(item.id)
@@ -45,15 +66,22 @@ const SaleCategories = ({
             return (
               <NavLink
                 key={item.id}
-                to={`/product/${item.id}`}
+                to={item.href ?? `/product/${item.id}`}
                 className="group flex h-full flex-col overflow-hidden rounded-xl border-b border-black/10 bg-white transition hover:-translate-y-1 hover:shadow-xl"
               >
                 <div className="relative h-40 overflow-hidden rounded-t-xl bg-gray-100">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
+                  {item.image ? (
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-neutral-100 text-neutral-400">
+                      <FaRegImage className="h-7 w-7" />
+                      <span className="text-xs font-medium">Нет фото</span>
+                    </div>
+                  )}
 
                   <button
                     type="button"
@@ -124,6 +152,7 @@ const SaleCategories = ({
             )
           })}
         </div>
+        )}
       </div>
     </section>
   )

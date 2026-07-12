@@ -1,49 +1,111 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import {
   getFavorites,
   toggleFavorite,
 } from "../../../helpers/Favorite/favorite"
 import type { SaleItem } from "../../../types/ui/Sale.type"
 import SaleCategories from "../../ui/home/SaleCategories"
+import {
+  useProductImages,
+  useProducts,
+  useProductVariants,
+} from "../../../hooks/useProducts"
+import { useImagesReady } from "../../../hooks/useImagesReady"
+import { productHrefBySlug } from "../../../helpers/slug"
+import { computeDisplayPrice } from "../../../helpers/price"
+
+const SALE_LIMIT = 4
+
+const formatPrice = (value: number) => `${value} BYN`
 
 const SaleCategoriesContainer = () => {
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
 
-  const saleItems: SaleItem[] = [
-    {
-      id: "1",
-      title: "Керамогранит светлый 60x60",
-      subtitle: "Керамогранит · 60x60",
-      description: "Матовая поверхность · Kerama Marazzi",
-      image:
-        "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-      price: "82 BYN",
-      oldPrice: "99 BYN",
-      isSale: true,
-    },
-    {
-      id: "2",
-      title: "Керамогранит под мрамор 80x80",
-      subtitle: "Керамогранит · 80x80",
-      description: "Лаппатированная поверхность · Paradyz",
-      image:
-        "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-      price: "79 BYN",
-      oldPrice: "95 BYN",
-      isSale: true,
-    },
-    {
-      id: "3",
-      title: "Затирка влагостойкая",
-      subtitle: "Сопутствующие товары",
-      description: "Mapei · Для ванной и кухни",
-      image:
-        "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
-      price: "18 BYN",
-      oldPrice: "24 BYN",
-      isSale: true,
-    },
-  ]
+  const { data: products = [], isLoading: isProductsLoading } = useProducts(
+    { onSale: true },
+    { enabled: true },
+  )
+
+  const topProducts = useMemo(
+    () => products.slice(0, SALE_LIMIT),
+    [products],
+  )
+
+  const productIds = useMemo(
+    () => topProducts.map((product) => product.id),
+    [topProducts],
+  )
+
+  const { data: productImages = [], isLoading: isImagesLoading } =
+    useProductImages(productIds)
+  const { data: productVariants = [], isLoading: isVariantsLoading } =
+    useProductVariants(productIds)
+
+  const imagesMap = useMemo(() => {
+    const map = new Map<string, string>()
+    productImages.forEach((image) => {
+      if (!map.has(image.product_id)) {
+        map.set(image.product_id, image.image_url)
+      }
+    })
+    return map
+  }, [productImages])
+
+  const saleItems = useMemo<SaleItem[]>(() => {
+    return topProducts.map((product) => {
+      const variants = productVariants.filter(
+        (variant) => variant.product_id === product.id,
+      )
+
+      const surfaces = [
+        ...new Set(
+          variants
+            .map((variant) => variant.surface_name)
+            .filter((surface): surface is string => Boolean(surface)),
+        ),
+      ]
+
+      // Минимальная цена со скидкой + перечёркнутая исходная
+      const display = computeDisplayPrice(variants)
+      const priceValue = display.price ?? product.price_from
+      const price =
+        priceValue != null
+          ? `${display.isFrom ? "от " : ""}${formatPrice(priceValue)}`
+          : "Цена по запросу"
+      const oldPrice = display.oldPrice
+        ? formatPrice(display.oldPrice)
+        : undefined
+
+      const subtitle = product.category_name
+      const description = [surfaces.join(", "), product.brand_name]
+        .filter(Boolean)
+        .join(" · ")
+
+      return {
+        id: product.id,
+        title: product.name,
+        subtitle,
+        description,
+        image: imagesMap.get(product.id) ?? "",
+        price,
+        oldPrice,
+        isSale: true,
+        href: productHrefBySlug(product.name),
+      }
+    })
+  }, [topProducts, productVariants, imagesMap])
+
+  const imageUrls = useMemo(
+    () => saleItems.map((item) => item.image).filter(Boolean),
+    [saleItems],
+  )
+
+  const imagesReady = useImagesReady(imageUrls)
+
+  const isLoading =
+    isProductsLoading ||
+    (productIds.length > 0 && (isImagesLoading || isVariantsLoading)) ||
+    (imageUrls.length > 0 && !imagesReady)
 
   useEffect(() => {
     const syncFavorites = () => {
@@ -63,7 +125,7 @@ const SaleCategoriesContainer = () => {
 
   const handleToggleFavorite = (
     event: React.MouseEvent<HTMLButtonElement>,
-    item: SaleItem
+    item: SaleItem,
   ) => {
     event.preventDefault()
     event.stopPropagation()
@@ -77,7 +139,7 @@ const SaleCategoriesContainer = () => {
       oldPrice: item.oldPrice
         ? Number(item.oldPrice.replace(/[^\d.]/g, ""))
         : undefined,
-      href: `/product/${item.id}`,
+      href: item.href ?? `/product/${item.id}`,
     })
 
     setFavoriteIds(getFavorites().map((item) => item.id))
@@ -86,6 +148,7 @@ const SaleCategoriesContainer = () => {
   return (
     <SaleCategories
       saleItems={saleItems}
+      isLoading={isLoading}
       favoriteIds={favoriteIds}
       onToggleFavorite={handleToggleFavorite}
     />

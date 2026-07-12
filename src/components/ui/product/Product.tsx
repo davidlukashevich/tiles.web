@@ -1,15 +1,28 @@
 import { NavLink } from "react-router-dom"
-import { useState } from "react"
-import { FaHeart } from "react-icons/fa6"
-import RequestModal from "../modal/RequestModal"
+import { useEffect, useRef, useState } from "react"
+import { FaHeart, FaRegImage } from "react-icons/fa6"
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io"
+import RequestModalContainer from "../../containers/product/RequestModalContainer"
 
 type ProductCharacteristic = {
     label: string
     value: string
 }
 
+type ProductVariant = {
+    id: string
+    size: string
+    surface: string
+    price: number | null
+    oldPrice?: number
+    discountPercent?: number
+    isOnSale: boolean
+    isRecommended: boolean
+}
+
 type Product = {
     id: string
+    sku?: string
     title: string
     category: string
     collection: string
@@ -17,14 +30,20 @@ type Product = {
     country?: string
     price: number
     oldPrice?: number | null
+    priceIsFrom?: boolean
     image: string
     images?: string[]
     characteristics: ProductCharacteristic[]
+    variants?: ProductVariant[]
+    youtubeUrl?: string | null
     href?: string
 }
 
+const formatPrice = (value: number) => `${value} BYN`
+
 type Props = {
     product?: Product
+    isLoading: boolean
     isRequestOpen: boolean
     isFavorite: boolean
     onOpenRequest: () => void
@@ -34,15 +53,78 @@ type Props = {
 
 const ProductView = ({
     product,
+    isLoading,
     isRequestOpen,
     isFavorite,
     onOpenRequest,
     onCloseRequest,
     onToggleFavorite,
 }: Props) => {
-    const [activeImage, setActiveImage] = useState(
-        product?.images?.[0] || product?.image || ""
-    )
+    const [activeIndex, setActiveIndex] = useState(0)
+    const stripRef = useRef<HTMLDivElement>(null)
+
+    // Сбрасываем на первую картинку, когда товар подгрузился/сменился
+    useEffect(() => {
+        setActiveIndex(0)
+    }, [product])
+
+    // Активная миниатюра доезжает в центр ленты
+    useEffect(() => {
+        const strip = stripRef.current
+        if (!strip) return
+
+        const thumb = strip.children[activeIndex] as HTMLElement | undefined
+        if (!thumb) return
+
+        const target =
+            strip.scrollLeft +
+            thumb.getBoundingClientRect().left -
+            strip.getBoundingClientRect().left -
+            (strip.clientWidth - thumb.clientWidth) / 2
+
+        strip.scrollLeft = target
+    }, [activeIndex])
+
+    if (isLoading) {
+        return (
+            <main className="bg-white px-4 py-8 md:px-6 xl:px-8 xl:py-10">
+                <div className="mx-auto max-w-[1280px]">
+                    <div className="mb-6 animate-pulse">
+                        <div className="h-3 w-24 rounded bg-gray-200" />
+                        <div className="mt-3 h-9 w-2/3 rounded bg-gray-200" />
+                    </div>
+
+                    <div className="grid animate-pulse items-start gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+                        <div>
+                            <div className="aspect-[16/11] w-full rounded-[24px] bg-gray-200" />
+                            <div className="mt-4 grid grid-cols-4 gap-3">
+                                {Array.from({ length: 4 }).map((_, index) => (
+                                    <div
+                                        key={index}
+                                        className="aspect-square rounded-[18px] bg-gray-200"
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="rounded-[24px] border border-black/10 p-6">
+                            <div className="h-3 w-24 rounded bg-gray-200" />
+                            <div className="mt-3 h-7 w-1/2 rounded bg-gray-200" />
+                            <div className="mt-6 space-y-4">
+                                {Array.from({ length: 5 }).map((_, index) => (
+                                    <div
+                                        key={index}
+                                        className="h-5 w-full rounded bg-gray-200"
+                                    />
+                                ))}
+                            </div>
+                            <div className="mt-6 h-9 w-1/3 rounded bg-gray-200" />
+                        </div>
+                    </div>
+                </div>
+            </main>
+        )
+    }
 
     if (!product) {
         return (
@@ -63,7 +145,21 @@ const ProductView = ({
         )
     }
 
-    const gallery = product.images?.length ? product.images : [product.image]
+    const gallery = (
+        product.images?.length ? product.images : [product.image]
+    ).filter(Boolean)
+
+    const total = gallery.length
+    const currentIndex = total ? Math.min(activeIndex, total - 1) : 0
+    const activeImage = gallery[currentIndex] ?? ""
+
+    const goPrev = () =>
+        setActiveIndex((currentIndex - 1 + total) % total)
+    const goNext = () => setActiveIndex((currentIndex + 1) % total)
+
+    const priceLabel = `${product.priceIsFrom ? "от " : ""}${formatPrice(product.price)}`
+
+    const variants = product.variants ?? []
 
     return (
         <>
@@ -80,41 +176,92 @@ const ProductView = ({
                     </div>
 
                     <section className="grid items-start gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-                        <div>
-                            <div className="overflow-hidden rounded-[24px] bg-[#f3f1ec]">
-                                <img
-                                    src={activeImage}
-                                    alt={product.title}
-                                    className="aspect-[16/11] w-full object-cover"
-                                />
-                            </div>
+                        <div className="min-w-0">
+                            <div className="group relative overflow-hidden rounded-[24px] bg-[#f3f1ec]">
+                                {activeImage ? (
+                                    <img
+                                        src={activeImage}
+                                        alt={product.title}
+                                        className="aspect-[16/11] w-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex aspect-[16/11] w-full flex-col items-center justify-center gap-2 text-neutral-400">
+                                        <FaRegImage className="h-10 w-10" />
+                                        <span className="text-sm font-medium">
+                                            Нет фото
+                                        </span>
+                                    </div>
+                                )}
 
-                            <div className="mt-4 grid grid-cols-4 gap-3">
-                                {gallery.map((image, index) => {
-                                    const isActive = image === activeImage
-
-                                    return (
+                                {total > 1 ? (
+                                    <>
                                         <button
-                                            key={`${image}-${index}`}
                                             type="button"
-                                            onClick={() => setActiveImage(image)}
-                                            className={`cursor-pointer overflow-hidden rounded-[18px] border transition ${isActive
-                                                    ? "border-black"
-                                                    : "border-black/10 hover:border-black/30"
-                                                }`}
+                                            onClick={goPrev}
+                                            aria-label="Предыдущее фото"
+                                            className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/90 text-black shadow-md transition hover:bg-black hover:text-white"
                                         >
-                                            <img
-                                                src={image}
-                                                alt={`${product.title} ${index + 1}`}
-                                                className="aspect-square w-full object-cover"
-                                            />
+                                            <IoIosArrowBack className="h-5 w-5" />
                                         </button>
-                                    )
-                                })}
+
+                                        <button
+                                            type="button"
+                                            onClick={goNext}
+                                            aria-label="Следующее фото"
+                                            className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white/90 text-black shadow-md transition hover:bg-black hover:text-white"
+                                        >
+                                            <IoIosArrowForward className="h-5 w-5" />
+                                        </button>
+
+                                        <div className="absolute bottom-3 right-3 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white">
+                                            {currentIndex + 1} / {total}
+                                        </div>
+                                    </>
+                                ) : null}
                             </div>
+
+                            {total > 1 ? (
+                                <div
+                                    ref={stripRef}
+                                    className="mt-4 flex gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                                >
+                                    {gallery.map((image, index) => {
+                                        const isActive = index === currentIndex
+
+                                        return (
+                                            <button
+                                                key={`${image}-${index}`}
+                                                type="button"
+                                                onClick={() => setActiveIndex(index)}
+                                                className={`h-20 w-20 shrink-0 cursor-pointer overflow-hidden rounded-[16px] border transition ${isActive
+                                                        ? "border-black"
+                                                        : "border-black/10 hover:border-black/30"
+                                                    }`}
+                                            >
+                                                <img
+                                                    src={image}
+                                                    alt={`${product.title} ${index + 1}`}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                            ) : null}
+
+                            {product.youtubeUrl ? (
+                                <a
+                                    href={product.youtubeUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="mt-4 flex h-12 items-center justify-center rounded-[16px] border border-black/10 px-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-black transition-all duration-200 hover:border-black hover:bg-black hover:text-white"
+                                >
+                                    Смотреть видео
+                                </a>
+                            ) : null}
                         </div>
 
-                        <div className="relative rounded-[24px] border border-black/10 bg-white p-5 md:p-6">
+                        <div className="relative min-w-0 rounded-[24px] border border-black/10 bg-white p-5 md:p-6">
                             <button
                                 type="button"
                                 onClick={onToggleFavorite}
@@ -167,17 +314,80 @@ const ProductView = ({
                                 ))}
                             </div>
 
-                            <div className="mt-6 flex items-end gap-3">
+                            <div className="mt-6 flex flex-wrap items-end gap-x-3 gap-y-1">
                                 <span className="text-3xl font-semibold text-black">
-                                    {product.price} BYN
+                                    {priceLabel}
                                 </span>
 
                                 {product.oldPrice ? (
                                     <span className="pb-1 text-lg text-gray-400 line-through">
-                                        {product.oldPrice} BYN
+                                        {formatPrice(product.oldPrice)}
                                     </span>
                                 ) : null}
                             </div>
+
+                            {variants.length > 0 ? (
+                                <div className="mt-6">
+                                    <p className="mb-3 text-[11px] uppercase tracking-[0.28em] text-gray-400">
+                                        Варианты
+                                    </p>
+
+                                    <div className="divide-y divide-black/10 overflow-hidden rounded-[16px] border border-black/10">
+                                        {variants.map((variant) => (
+                                            <div
+                                                key={variant.id}
+                                                className="flex flex-wrap items-center justify-between gap-3 p-4"
+                                            >
+                                                <div className="min-w-0">
+                                                    <div className="flex flex-wrap items-center gap-2 text-sm">
+                                                        <span className="font-medium text-[#2f2f2f]">
+                                                            {variant.size}
+                                                        </span>
+                                                        <span className="text-neutral-300">·</span>
+                                                        <span className="text-gray-600">
+                                                            {variant.surface}
+                                                        </span>
+                                                    </div>
+
+                                                    {(variant.isOnSale || variant.isRecommended) && (
+                                                        <div className="mt-2 flex flex-wrap gap-2">
+                                                            {variant.isOnSale && (
+                                                                <span className="rounded-full bg-yellow-400 px-2.5 py-0.5 text-[11px] font-semibold text-white">
+                                                                    Распродажа
+                                                                </span>
+                                                            )}
+                                                            {variant.isRecommended && (
+                                                                <span className="rounded-full bg-green-500 px-2.5 py-0.5 text-[11px] font-semibold text-white">
+                                                                    Новинка
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="text-right">
+                                                    {variant.price != null ? (
+                                                        <div className="flex items-baseline justify-end gap-2">
+                                                            <span className="text-lg font-semibold text-black">
+                                                                {formatPrice(variant.price)}
+                                                            </span>
+                                                            {variant.oldPrice ? (
+                                                                <span className="text-sm text-gray-400 line-through">
+                                                                    {formatPrice(variant.oldPrice)}
+                                                                </span>
+                                                            ) : null}
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-sm text-gray-500">
+                                                            Цена по запросу
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : null}
 
                             <div className="mt-6 grid gap-3 sm:grid-cols-2">
                                 <button
@@ -200,7 +410,12 @@ const ProductView = ({
                 </div>
             </main>
 
-            <RequestModal isOpen={isRequestOpen} onClose={onCloseRequest} />
+            <RequestModalContainer
+                isOpen={isRequestOpen}
+                onClose={onCloseRequest}
+                productId={product.id}
+                productName={product.title}
+            />
         </>
     )
 }

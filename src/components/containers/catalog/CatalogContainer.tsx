@@ -21,6 +21,8 @@ import {
   useProductVariants,
 } from "../../../hooks/useProducts"
 import { useImagesReady } from "../../../hooks/useImagesReady"
+import { productHrefBySlug } from "../../../helpers/slug"
+import { computeDisplayPrice } from "../../../helpers/price"
 import type { ProductQueryParams } from "../../../api/product.api"
 
 import { buildCatalogGroups } from "../../../helpers/Catalog/buildCatalogGroups"
@@ -64,9 +66,12 @@ const CatalogContainer = () => {
   // Корень «Керамогранит» — показываем все товары (без фильтра категории)
   const isTilesRoot = !isSelectionPage && activeCategory === "tiles"
 
+  // Распродажа — товары, у которых есть вариант с is_on_sale = true
+  const isSalePage = !isSelectionPage && activeCategory === "sale"
+
   const productsEnabled = isSelectionPage
     ? Boolean(collectionName)
-    : isTilesRoot
+    : isTilesRoot || isSalePage
       ? true
       : Boolean(categorySlug)
 
@@ -83,6 +88,7 @@ const CatalogContainer = () => {
     return {
       categorySlug: isSelectionPage ? undefined : categorySlug,
       collectionName: isSelectionPage ? collectionName : undefined,
+      onSale: isSalePage ? true : undefined,
       manufacturers: appliedFilters.manufacturers,
       formats: appliedFilters.formats,
       surfaceTypes: appliedFilters.surfaceTypes,
@@ -95,7 +101,7 @@ const CatalogContainer = () => {
           ? priceTo
           : undefined,
     }
-  }, [isSelectionPage, categorySlug, collectionName, appliedFilters])
+  }, [isSelectionPage, isSalePage, categorySlug, collectionName, appliedFilters])
 
   const { data: productsData = [], isLoading: isProductsLoading } =
     useProducts(productParams, { enabled: productsEnabled })
@@ -126,30 +132,51 @@ const CatalogContainer = () => {
     return map
   }, [productImages])
 
-  // product_id -> уникальные размеры вариантов (в порядке sort_order)
-  const sizesMap = useMemo(() => {
-    const map = new Map<string, string[]>()
-
+  // product_id -> варианты (для размеров/поверхностей/флагов/цены)
+  const variantsByProduct = useMemo(() => {
+    const map = new Map<string, typeof productVariants>()
     productVariants.forEach((variant) => {
-      if (!variant.size_name) return
-
-      const sizes = map.get(variant.product_id) ?? []
-      if (!sizes.includes(variant.size_name)) {
-        sizes.push(variant.size_name)
-      }
-      map.set(variant.product_id, sizes)
+      const list = map.get(variant.product_id) ?? []
+      list.push(variant)
+      map.set(variant.product_id, list)
     })
-
     return map
   }, [productVariants])
 
   const productsWithImages = useMemo<CatalogCardProduct[]>(() => {
-    return products.map((product) => ({
-      ...product,
-      image_url: imagesMap.get(product.id) ?? null,
-      sizes: sizesMap.get(product.id) ?? [],
-    }))
-  }, [products, imagesMap, sizesMap])
+    return products.map((product) => {
+      const variants = variantsByProduct.get(product.id) ?? []
+
+      const sizes = [
+        ...new Set(
+          variants
+            .map((v) => v.size_name)
+            .filter((s): s is string => Boolean(s)),
+        ),
+      ]
+      const surfaces = [
+        ...new Set(
+          variants
+            .map((v) => v.surface_name)
+            .filter((s): s is string => Boolean(s)),
+        ),
+      ]
+
+      const display = computeDisplayPrice(variants)
+
+      return {
+        ...product,
+        image_url: imagesMap.get(product.id) ?? null,
+        sizes,
+        surfaces,
+        isOnSale: variants.some((v) => v.is_on_sale),
+        isRecommended: variants.some((v) => v.is_recommended),
+        displayPrice: display.price ?? product.price_from,
+        displayOldPrice: display.oldPrice,
+        priceIsFrom: display.isFrom,
+      }
+    })
+  }, [products, imagesMap, variantsByProduct])
 
   // Пагинация — 9 карточек на страницу
   const [page, setPage] = useState(1)
@@ -250,7 +277,7 @@ const CatalogContainer = () => {
       image: product.image_url ?? PRODUCT_PLACEHOLDER_IMAGE,
       price: product.price_from ?? 0,
       oldPrice: undefined,
-      href: `/product/${product.sku}`,
+      href: productHrefBySlug(product.name),
     })
 
     setFavoriteIds(getFavorites().map((item) => item.id))
