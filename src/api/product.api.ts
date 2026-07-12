@@ -1,5 +1,9 @@
 import { supabase } from "../lib/supabase";
-import type { Product, ProductImage } from "../types/response/Product.type";
+import type {
+    Product,
+    ProductImage,
+    ProductVariant,
+} from "../types/response/Product.type";
 
 export type ProductQueryParams = {
     categorySlug?: string
@@ -96,6 +100,27 @@ export const getProductImagesByProductIds = async (
     const { data, error } = await supabase
         .from("public_product_images_view")
         .select("id, product_id, image_url, image_path, sort_order")
+        .in("product_id", productIds)
+        .order("sort_order")
+        .order("id")
+
+    if (error) {
+        throw new Error(error.message)
+    }
+
+    return data
+}
+
+export const getProductVariantsByProductIds = async (
+    productIds: string[],
+): Promise<ProductVariant[]> => {
+    if (productIds.length === 0) return []
+
+    const { data, error } = await supabase
+        .from("public_product_variants_view")
+        .select(
+            "id, product_id, size_name, surface_name, price, discount_percent, is_on_sale, is_recommended, sort_order",
+        )
         .in("product_id", productIds)
         .order("sort_order")
         .order("id")

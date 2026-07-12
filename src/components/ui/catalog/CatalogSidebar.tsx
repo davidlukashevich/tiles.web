@@ -113,10 +113,10 @@ const CatalogSidebar = ({
         />
 
         <aside
-          className={`absolute left-0 top-0 h-full w-[86%] max-w-[380px] bg-white p-4 transition-transform duration-300 ${isMobileOpen ? "translate-x-0" : "-translate-x-full"
+          className={`absolute left-0 top-0 flex h-full w-[86%] max-w-[380px] flex-col bg-white p-4 transition-transform duration-300 ${isMobileOpen ? "translate-x-0" : "-translate-x-full"
             }`}
         >
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex shrink-0 items-center justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.28em] text-gray-400">
                 Каталог
@@ -137,11 +137,13 @@ const CatalogSidebar = ({
             </button>
           </div>
 
-          <CatalogSidebarContent
-            groups={groups}
-            activeValue={activeValue}
-            onNavigate={onMobileClose}
-          />
+          <div className="-mr-2 flex-1 overflow-y-auto pr-2">
+            <CatalogSidebarContent
+              groups={groups}
+              activeValue={activeValue}
+              onNavigate={onMobileClose}
+            />
+          </div>
         </aside>
       </div>
     </>

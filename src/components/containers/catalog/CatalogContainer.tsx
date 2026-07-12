@@ -4,7 +4,10 @@ import { useParams } from "react-router-dom"
 import CatalogView from "../../ui/catalog/CatalogView"
 
 import type { CatalogFilters } from "../../../types/ui/Catalog.type"
-import type { ProductWithImage } from "../../../types/response/Product.type"
+import type {
+  CatalogCardProduct,
+  ProductWithImage,
+} from "../../../types/response/Product.type"
 
 import {
   getFavorites,
@@ -12,7 +15,12 @@ import {
 } from "../../../helpers/Favorite/favorite"
 
 import { useCategories } from "../../../hooks/useCategories"
-import { useProductImages, useProducts } from "../../../hooks/useProducts"
+import {
+  useProductImages,
+  useProducts,
+  useProductVariants,
+} from "../../../hooks/useProducts"
+import { useImagesReady } from "../../../hooks/useImagesReady"
 import type { ProductQueryParams } from "../../../api/product.api"
 
 import { buildCatalogGroups } from "../../../helpers/Catalog/buildCatalogGroups"
@@ -29,6 +37,8 @@ const initialFilters: CatalogFilters = {
 
 const PRODUCT_PLACEHOLDER_IMAGE =
   "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80"
+
+const PRODUCTS_PER_PAGE = 9
 
 const CatalogContainer = () => {
   const { type, section, slug } = useParams()
@@ -50,6 +60,15 @@ const CatalogContainer = () => {
       activeCategory !== "sale"
       ? activeCategory
       : ""
+
+  // Корень «Керамогранит» — показываем все товары (без фильтра категории)
+  const isTilesRoot = !isSelectionPage && activeCategory === "tiles"
+
+  const productsEnabled = isSelectionPage
+    ? Boolean(collectionName)
+    : isTilesRoot
+      ? true
+      : Boolean(categorySlug)
 
   const { data: categories = [] } = useCategories()
 
@@ -78,13 +97,22 @@ const CatalogContainer = () => {
     }
   }, [isSelectionPage, categorySlug, collectionName, appliedFilters])
 
-  const { data: products = [] } = useProducts(productParams)
+  const { data: productsData = [], isLoading: isProductsLoading } =
+    useProducts(productParams, { enabled: productsEnabled })
+
+  // Если запрос выключен (например, корень «Сопутствующие товары»),
+  // не показываем данные, даже если они лежат в кэше по такому же ключу.
+  const products = productsEnabled ? productsData : []
 
   const productIds = useMemo(() => {
     return products.map((product) => product.id)
   }, [products])
 
-  const { data: productImages = [] } = useProductImages(productIds)
+  const { data: productImages = [], isLoading: isImagesLoading } =
+    useProductImages(productIds)
+
+  const { data: productVariants = [], isLoading: isVariantsLoading } =
+    useProductVariants(productIds)
 
   const imagesMap = useMemo(() => {
     const map = new Map<string, string>()
@@ -98,12 +126,74 @@ const CatalogContainer = () => {
     return map
   }, [productImages])
 
-  const productsWithImages = useMemo<ProductWithImage[]>(() => {
+  // product_id -> уникальные размеры вариантов (в порядке sort_order)
+  const sizesMap = useMemo(() => {
+    const map = new Map<string, string[]>()
+
+    productVariants.forEach((variant) => {
+      if (!variant.size_name) return
+
+      const sizes = map.get(variant.product_id) ?? []
+      if (!sizes.includes(variant.size_name)) {
+        sizes.push(variant.size_name)
+      }
+      map.set(variant.product_id, sizes)
+    })
+
+    return map
+  }, [productVariants])
+
+  const productsWithImages = useMemo<CatalogCardProduct[]>(() => {
     return products.map((product) => ({
       ...product,
       image_url: imagesMap.get(product.id) ?? null,
+      sizes: sizesMap.get(product.id) ?? [],
     }))
-  }, [products, imagesMap])
+  }, [products, imagesMap, sizesMap])
+
+  // Пагинация — 9 карточек на страницу
+  const [page, setPage] = useState(1)
+
+  // Сброс на первую страницу при смене категории/подборки/фильтров
+  useEffect(() => {
+    setPage(1)
+  }, [productParams])
+
+  const pageCount = Math.max(
+    1,
+    Math.ceil(productsWithImages.length / PRODUCTS_PER_PAGE),
+  )
+
+  // Не остаёмся на несуществующей странице, если список сократился
+  useEffect(() => {
+    if (page > pageCount) setPage(pageCount)
+  }, [page, pageCount])
+
+  const pagedProducts = useMemo(() => {
+    const start = (page - 1) * PRODUCTS_PER_PAGE
+    return productsWithImages.slice(start, start + PRODUCTS_PER_PAGE)
+  }, [productsWithImages, page])
+
+  // Предзагружаем картинки только текущей страницы
+  const imageUrls = useMemo(() => {
+    return pagedProducts
+      .map((product) => product.image_url)
+      .filter((url): url is string => Boolean(url))
+  }, [pagedProducts])
+
+  const imagesReady = useImagesReady(imageUrls)
+
+  // Пока грузятся товары, их картинки (запрос) или пока картинки
+  // физически не догрузились в браузере — показываем состояние загрузки.
+  const isLoading =
+    isProductsLoading ||
+    (productIds.length > 0 && (isImagesLoading || isVariantsLoading)) ||
+    (imageUrls.length > 0 && !imagesReady)
+
+  const handlePageChange = (next: number) => {
+    setPage(next)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
 
   const catalogGroups = useMemo(() => {
     return isSelectionPage
@@ -183,7 +273,11 @@ const CatalogContainer = () => {
   return (
     <CatalogView
       groups={catalogGroups}
-      products={productsWithImages}
+      products={pagedProducts}
+      isLoading={isLoading}
+      page={page}
+      pageCount={pageCount}
+      onPageChange={handlePageChange}
       favoriteIds={favoriteIds}
       activeCategory={activeCategory}
       title={title}

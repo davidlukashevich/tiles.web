@@ -1,18 +1,16 @@
+import { useState } from "react"
 import { NavLink } from "react-router-dom"
-import { FaHeart } from "react-icons/fa6"
-import type { ProductWithImage } from "../../../types/response/Product.type"
+import { FaHeart, FaRegImage } from "react-icons/fa6"
+import type { CatalogCardProduct } from "../../../types/response/Product.type"
 
 type Props = {
-  product: ProductWithImage
+  product: CatalogCardProduct
   isFavorite: boolean
   onToggleFavorite: (
     event: React.MouseEvent<HTMLButtonElement>,
-    product: ProductWithImage,
+    product: CatalogCardProduct,
   ) => void
 }
-
-const PRODUCT_PLACEHOLDER_IMAGE =
-  "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80"
 
 const getPriceText = (priceFrom: number | null, priceTo: number | null) => {
   if (priceFrom === null && priceTo === null) return "Цена по запросу"
@@ -32,15 +30,26 @@ const CatalogProductCard = ({
   const productHref = `/product/${product.sku}`
   const priceText = getPriceText(product.price_from, product.price_to)
 
+  const [hasImageError, setHasImageError] = useState(false)
+  const showImage = Boolean(product.image_url) && !hasImageError
+
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-[28px] bg-[#f3f0ea] transition hover:-translate-y-1 hover:shadow-xl">
       <NavLink to={productHref} className="block">
         <div className="relative aspect-[4/3] overflow-hidden bg-neutral-200">
-          <img
-            src={product.image_url ?? PRODUCT_PLACEHOLDER_IMAGE}
-            alt={product.name}
-            className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
-          />
+          {showImage ? (
+            <img
+              src={product.image_url ?? undefined}
+              alt={product.name}
+              onError={() => setHasImageError(true)}
+              className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+            />
+          ) : (
+            <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-neutral-100 text-neutral-400">
+              <FaRegImage className="h-8 w-8" />
+              <span className="text-xs font-medium">Нет фото</span>
+            </div>
+          )}
 
           <button
             type="button"
@@ -84,14 +93,15 @@ const CatalogProductCard = ({
         </p>
 
         <div className="flex min-h-[40px] flex-wrap items-start gap-x-2 gap-y-1 text-sm text-neutral-600">
-          {product.category_name ? <span>{product.category_name}</span> : null}
-
-          {product.sort_name ? (
-            <>
-              <span className="text-neutral-300">|</span>
-              <span>{product.sort_name}</span>
-            </>
+          {product.sizes.length > 0 ? (
+            <span>{product.sizes.join(", ")}</span>
           ) : null}
+
+          {product.sizes.length > 0 && product.country_name ? (
+            <span className="text-neutral-300">|</span>
+          ) : null}
+
+          {product.country_name ? <span>{product.country_name}</span> : null}
         </div>
 
         <div className="mt-auto mb-5 flex items-end gap-3 pt-5">

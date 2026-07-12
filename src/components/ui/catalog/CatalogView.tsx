@@ -1,6 +1,8 @@
 import { useEffect } from "react"
 import CatalogFilterModal from "./CatalogFilterModal"
+import CatalogPagination from "./CatalogPagination"
 import CatalogProductCard from "./CatalogProductCard"
+import CatalogProductSkeleton from "./CatalogProductSkeleton"
 import CatalogSidebar from "./CatalogSidebar"
 
 import type {
@@ -8,11 +10,15 @@ import type {
   CatalogGroup,
 } from "../../../types/ui/Catalog.type"
 
-import type { ProductWithImage } from "../../../types/response/Product.type"
+import type { CatalogCardProduct } from "../../../types/response/Product.type"
 
 type Props = {
   groups: CatalogGroup[]
-  products: ProductWithImage[]
+  products: CatalogCardProduct[]
+  isLoading: boolean
+  page: number
+  pageCount: number
+  onPageChange: (page: number) => void
   favoriteIds: string[]
   activeCategory: string
   title: string
@@ -29,13 +35,17 @@ type Props = {
   onApplyFilters: () => void
   onToggleFavorite: (
     event: React.MouseEvent<HTMLButtonElement>,
-    product: ProductWithImage,
+    product: CatalogCardProduct,
   ) => void
 }
 
 const CatalogView = ({
   groups,
   products,
+  isLoading,
+  page,
+  pageCount,
+  onPageChange,
   favoriteIds,
   activeCategory,
   title,
@@ -53,12 +63,13 @@ const CatalogView = ({
   onToggleFavorite,
 }: Props) => {
   useEffect(() => {
-    document.body.style.overflow = isFilterOpen ? "hidden" : ""
+    const isLocked = isFilterOpen || isSectionsOpen
+    document.body.style.overflow = isLocked ? "hidden" : ""
 
     return () => {
       document.body.style.overflow = ""
     }
-  }, [isFilterOpen])
+  }, [isFilterOpen, isSectionsOpen])
 
   return (
     <main className="bg-white py-10 xl:py-14">
@@ -112,17 +123,31 @@ const CatalogView = ({
           />
 
           <div className="min-w-0">
-            {products.length > 0 ? (
+            {isLoading ? (
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 2xl:grid-cols-3">
-                {products.map((product) => (
-                  <CatalogProductCard
-                    key={product.id}
-                    product={product}
-                    isFavorite={favoriteIds.includes(product.id)}
-                    onToggleFavorite={onToggleFavorite}
-                  />
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <CatalogProductSkeleton key={index} />
                 ))}
               </div>
+            ) : products.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 2xl:grid-cols-3">
+                  {products.map((product) => (
+                    <CatalogProductCard
+                      key={product.id}
+                      product={product}
+                      isFavorite={favoriteIds.includes(product.id)}
+                      onToggleFavorite={onToggleFavorite}
+                    />
+                  ))}
+                </div>
+
+                <CatalogPagination
+                  page={page}
+                  pageCount={pageCount}
+                  onChange={onPageChange}
+                />
+              </>
             ) : (
               <div className="rounded-[24px] bg-[#f3f1ec] p-8 text-center text-gray-600">
                 Товары не найдены

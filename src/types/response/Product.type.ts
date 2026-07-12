@@ -33,6 +33,23 @@ export type ProductImage = {
   sort_order: number
 }
 
+export type ProductVariant = {
+  id: string
+  product_id: string
+  size_name: string | null
+  surface_name: string | null
+  price: number | null
+  discount_percent: number | null
+  is_on_sale: boolean
+  is_recommended: boolean
+  sort_order: number
+}
+
 export type ProductWithImage = Product & {
   image_url: string | null
+}
+
+// То, что реально показывает карточка каталога: товар + картинка + размеры
+export type CatalogCardProduct = ProductWithImage & {
+  sizes: string[]
 }
