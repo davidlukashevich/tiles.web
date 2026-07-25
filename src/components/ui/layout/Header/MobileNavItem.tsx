@@ -81,9 +81,9 @@ export default function MobileNavItem({
           ) : (
             <ul className="space-y-1 pl-2">
               {item.children?.map((child) => (
-                <li key={child.href}>
+                <li key={child.label}>
                   <NavLink
-                    to={child.href}
+                    to={child.href ?? "/"}
                     onClick={onNavigate}
                     className="block rounded-xl py-2 text-[14px] text-neutral-600 transition-colors hover:text-neutral-950"
                   >

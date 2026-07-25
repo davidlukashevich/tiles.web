@@ -154,7 +154,7 @@ export default function Footer({
             {legalLinks.map((link) => (
               <NavLink
                 key={link.href}
-                to={link.href}
+                to={link.href ?? "/"}
                 className="transition hover:text-white"
               >
                 {link.label}
@@ -183,7 +183,7 @@ const FooterColumn = ({ title, links }: FooterColumnProps) => {
         {links.map((link) => (
           <li key={link.href}>
             <NavLink
-              to={link.href}
+              to={link.href ?? "/"}
               className="text-[14px] text-white/70 transition hover:text-white"
             >
               {link.label}

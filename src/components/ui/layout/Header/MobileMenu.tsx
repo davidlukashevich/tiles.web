@@ -1,7 +1,6 @@
 import { FaPhone } from "react-icons/fa6"
 import { IoIosClose } from "react-icons/io"
-import type { SocialLink } from "../../../../data/navigation"
-import type { NavItem } from "../../../../types/ui/Header.type"
+import type { NavItem, SocialLink } from "../../../../data/navigation"
 import MobileNavItem from "./MobileNavItem"
 
 type MobileMenuProps = {

@@ -96,9 +96,9 @@ export default function DesktopNavItem({
           ) : (
             <ul className="space-y-1">
               {item.children?.map((child) => (
-                <li key={child.href}>
+                <li key={child.label}>
                   <NavLink
-                    to={child.href}
+                    to={child.href ?? "/"}
                     onClick={() => setIsOpen(false)}
                     className={({ isActive }) =>
                       [
