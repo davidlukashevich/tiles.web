@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useLocation, useParams } from "react-router-dom"
 import ProductView from "../../ui/product/Product"
 import {
   isFavorite,
@@ -19,6 +19,11 @@ const ProductContainer = () => {
 
   const { id } = useParams()
   const identifier = id ?? ""
+
+  // Куда ведёт «В каталог» — на страницу, с которой пришли (с ?page), иначе в общий каталог
+  const location = useLocation()
+  const backHref =
+    (location.state as { from?: string } | null)?.from ?? "/catalog/tiles"
 
   const { data: product = null, isLoading: isProductLoading } =
     useProduct(identifier)
@@ -167,6 +172,7 @@ const ProductContainer = () => {
     <ProductView
       product={viewProduct}
       isLoading={isLoading}
+      backHref={backHref}
       isRequestOpen={isRequestOpen}
       isFavorite={favorite}
       onOpenRequest={() => setIsRequestOpen(true)}

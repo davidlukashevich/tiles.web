@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { NavLink } from "react-router-dom"
+import { NavLink, useLocation } from "react-router-dom"
 import { FaHeart, FaRegImage } from "react-icons/fa6"
 import type { CatalogCardProduct } from "../../../types/response/Product.type"
 import { productHrefBySlug } from "../../../helpers/slug"
@@ -20,12 +20,15 @@ const CatalogProductCard = ({
 }: Props) => {
   const productHref = productHrefBySlug(product.name)
 
+  const location = useLocation()
+  const fromState = { from: `${location.pathname}${location.search}` }
+
   const [hasImageError, setHasImageError] = useState(false)
   const showImage = Boolean(product.image_url) && !hasImageError
 
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-[28px] bg-[#f3f0ea] transition hover:-translate-y-1 hover:shadow-xl">
-      <NavLink to={productHref} className="block">
+      <NavLink to={productHref} state={fromState} className="block">
         <div className="relative aspect-[4/3] overflow-hidden bg-neutral-200">
           {showImage ? (
             <img
@@ -88,7 +91,7 @@ const CatalogProductCard = ({
           {product.category_name}
         </p>
 
-        <NavLink to={productHref}>
+        <NavLink to={productHref} state={fromState}>
           <h3 className="mb-4 min-h-[56px] text-lg font-medium leading-snug text-black transition hover:text-neutral-600 sm:text-xl">
             {product.name}
           </h3>
@@ -141,6 +144,7 @@ const CatalogProductCard = ({
 
         <NavLink
           to={productHref}
+          state={fromState}
           className="w-full rounded-2xl bg-white px-5 py-3 text-center text-sm font-medium text-black transition-colors hover:bg-black hover:text-white"
         >
           Подробнее

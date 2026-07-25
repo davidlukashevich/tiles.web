@@ -44,6 +44,7 @@ const formatPrice = (value: number) => `${value} BYN`
 type Props = {
     product?: Product
     isLoading: boolean
+    backHref: string
     isRequestOpen: boolean
     isFavorite: boolean
     onOpenRequest: () => void
@@ -54,6 +55,7 @@ type Props = {
 const ProductView = ({
     product,
     isLoading,
+    backHref,
     isRequestOpen,
     isFavorite,
     onOpenRequest,
@@ -135,7 +137,7 @@ const ProductView = ({
                     </h1>
 
                     <NavLink
-                        to="/catalog/tiles"
+                        to={backHref}
                         className="mt-6 inline-flex h-11 items-center justify-center rounded-[14px] border border-black/10 bg-white px-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-black transition-all duration-200 hover:border-black hover:bg-black hover:text-white"
                     >
                         Вернуться в каталог
@@ -399,7 +401,7 @@ const ProductView = ({
                                 </button>
 
                                 <NavLink
-                                    to="/catalog/tiles"
+                                    to={backHref}
                                     className="flex h-12 items-center justify-center rounded-[14px] border border-black/10 px-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-black transition-all duration-200 hover:bg-[#f3f1ec]"
                                 >
                                     В каталог
