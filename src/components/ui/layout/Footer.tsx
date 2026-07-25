@@ -5,6 +5,7 @@ import type {
   NavLinkItem,
 } from "../../../data/navigation"
 import { FaPhone } from "react-icons/fa6"
+import Container from "./Container"
 
 type FooterProps = {
   logoSrc: string
@@ -12,7 +13,7 @@ type FooterProps = {
   brandSubtitle?: string
   phone: string
   phoneHref: string
-  workTime: string
+  workTime: string[]
   addressLines: string[]
   navigation: NavItem[]
   socialLinks: SocialLink[]
@@ -44,8 +45,8 @@ export default function Footer({
   const buyerLinks = howToBuyItem?.children ?? []
 
   return (
-    <footer className="bg-[#292625] px-4 py-14 text-white md:px-6 xl:px-8">
-      <div className="mx-auto max-w-[1280px]">
+    <footer className="bg-[#292625] py-14 text-white">
+      <Container>
         <div className="grid gap-10 xl:grid-cols-[260px_1fr]">
           <div>
             <NavLink to="/" className="flex items-start gap-4">
@@ -105,9 +106,11 @@ export default function Footer({
                 <span>{phone}</span>
               </a>
 
-              <p className="mt-5 text-[14px] leading-6 text-white/70">
-                {workTime}
-              </p>
+              <div className="mt-5 text-[14px] leading-6 text-white/70">
+                {workTime.map((line) => (
+                  <p key={line}>{line}</p>
+                ))}
+              </div>
 
               <div className="mt-5 text-[14px] leading-6 text-white/70">
                 {addressLines.map((line) => (
@@ -159,7 +162,7 @@ export default function Footer({
             ))}
           </div>
         </div>
-      </div>
+      </Container>
     </footer>
   )
 }

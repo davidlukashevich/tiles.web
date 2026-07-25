@@ -2,6 +2,7 @@ import { ArrowUpRight, Clock3, MapPin, Phone } from "lucide-react"
 
 import viberIcon from "../../../assets/viber.jpeg"
 import kufarIcon from "../../../assets/kufar.jpeg"
+import telegramIcon from "../../../assets/telegram.png"
 
 type Props = {
     mapUrl: string
@@ -10,20 +11,25 @@ type Props = {
 const socialLinks = [
     {
         label: "Viber",
-        href: "#",
+        href: "https://invite.viber.com/?g2=AQBrYsk0U9HR7E7kqW8mB2B7%2BjO58CRdE7FNq18DI1vchPl2j%2Fg3N6qMHTt9BlrU&lang=pl",
         img: viberIcon,
     },
     {
         label: "Kufar",
-        href: "#",
+        href: "https://www.kufar.by/user/OvIl4pMf5MitD1nz_o3aRWo?previousUrl=https%3A%2F%2Fwww.kufar.by%2Fitem%2F1057720139&widgetPosition=upper",
         img: kufarIcon,
+    },
+    {
+        label: "Telegram",
+        href: "https://web.telegram.org/",
+        img: telegramIcon,
     },
 ]
 
 const AboutUs = ({ mapUrl }: Props) => {
     return (
         <main className="bg-white px-4 py-10 md:px-6 md:py-14 xl:px-8 xl:py-16">
-            <section className="mx-auto max-w-[1280px]">
+            <section className="mx-auto max-w-[1440px]">
                 <div className="grid gap-10 xl:grid-cols-[1.2fr_0.8fr]">
                     <div className="xl:pt-6">
                         <h1 className="max-w-[720px] text-[36px] leading-[1.1] text-[#111] md:text-[36px] xl:text-[36px]">
@@ -85,9 +91,9 @@ const AboutUs = ({ mapUrl }: Props) => {
                                     <p className="text-xs uppercase tracking-[0.24em] text-[#9a968f]">
                                         Адрес
                                     </p>
-                                    <p className="mt-2 text-[17px] leading-7 text-[#2f2f2f]">
-                                        г. Минск <br />
-                                        ул. Примерная, 10
+                                    <p className="mt-1 text-[17px] leading-7 text-[#2f2f2f]">
+                                        г. Иваново <br />
+                                        ул.Кирова 52
                                     </p>
                                 </div>
                             </div>
@@ -102,12 +108,12 @@ const AboutUs = ({ mapUrl }: Props) => {
                                         Телефон
                                     </p>
 
-                                    <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
+                                    <div className="mt-1 flex flex-wrap items-center justify-between gap-4">
                                         <a
-                                            href="tel:+375290000000"
+                                            href="tel:+375336665856"
                                             className="text-[17px] text-[#2f2f2f] transition hover:opacity-70"
                                         >
-                                            +375 (29) 000-00-00
+                                            +375 (33) 666-58-56
                                         </a>
 
                                         <div className="flex items-center gap-2">
@@ -141,9 +147,10 @@ const AboutUs = ({ mapUrl }: Props) => {
                                     <p className="text-xs uppercase tracking-[0.24em] text-[#9a968f]">
                                         Часы работы
                                     </p>
-                                    <p className="mt-2 text-[17px] leading-7 text-[#2f2f2f]">
-                                        Пн–Пт: 9:00–20:00 <br />
-                                        Сб–Вс: 10:00–18:00
+                                    <p className="mt-1 text-[17px] leading-7 text-[#2f2f2f]">
+                                        Пн: Выходной <br />
+                                        Вт - Пт: 09:00 – 18:00 <br />
+                                        Сб - Вс: 09:00 - 15:00
                                     </p>
                                 </div>
                             </div>

@@ -88,7 +88,7 @@ const ProductView = ({
     if (isLoading) {
         return (
             <main className="bg-white px-4 py-8 md:px-6 xl:px-8 xl:py-10">
-                <div className="mx-auto max-w-[1280px]">
+                <div className="mx-auto max-w-[1440px]">
                     <div className="mb-6 animate-pulse">
                         <div className="h-3 w-24 rounded bg-gray-200" />
                         <div className="mt-3 h-9 w-2/3 rounded bg-gray-200" />
@@ -129,7 +129,7 @@ const ProductView = ({
     if (!product) {
         return (
             <main className="bg-white px-4 py-16">
-                <div className="mx-auto max-w-[1280px] rounded-[24px] bg-[#f3f1ec] p-8 text-center">
+                <div className="mx-auto max-w-[1440px] rounded-[24px] bg-[#f3f1ec] p-8 text-center">
                     <h1 className="text-3xl uppercase text-[#2f2f2f]">
                         Товар не найден
                     </h1>
@@ -164,7 +164,7 @@ const ProductView = ({
     return (
         <>
             <main className="bg-white px-4 py-8 md:px-6 xl:px-8 xl:py-10">
-                <div className="mx-auto max-w-[1280px]">
+                <div className="mx-auto max-w-[1440px]">
                     <div className="mb-6">
                         <p className="text-xs uppercase tracking-[0.3em] text-gray-400">
                             {product.category}

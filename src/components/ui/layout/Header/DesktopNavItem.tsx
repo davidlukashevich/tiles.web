@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { NavLink } from "react-router-dom"
 import type { NavItem } from "../../../../data/navigation"
+import NavChildList from "./NavChildList"
 
 type DesktopNavItemProps = {
   item: NavItem
@@ -84,26 +85,11 @@ export default function DesktopNavItem({
                     {group.label}
                   </NavLink>
 
-                  <ul className="space-y-1">
-                    {group.children.map((child) => (
-                      <li key={child.href}>
-                        <NavLink
-                          to={child.href}
-                          onClick={() => setIsOpen(false)}
-                          className={({ isActive }) =>
-                            [
-                              "block rounded-xl px-3 py-2 text-[14px] transition-colors",
-                              isActive
-                                ? "bg-neutral-50 text-neutral-950"
-                                : "text-neutral-700 hover:bg-neutral-50 hover:text-neutral-950",
-                            ].join(" ")
-                          }
-                        >
-                          {child.label}
-                        </NavLink>
-                      </li>
-                    ))}
-                  </ul>
+                  <NavChildList
+                    items={group.children}
+                    onNavigate={() => setIsOpen(false)}
+                    variant="desktop"
+                  />
                 </div>
               ))}
             </div>

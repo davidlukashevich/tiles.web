@@ -177,8 +177,17 @@ const RequestModal = ({
                                     }
                                     onBlur={() => onBlur("message")}
                                     placeholder="Например: нужен расчет плитки для ванной комнаты"
-                                    className="resize-none rounded-[18px] border border-black/10 px-5 py-4 text-sm outline-none transition-all placeholder:text-neutral-400 focus:border-black"
+                                    aria-invalid={Boolean(showError("message"))}
+                                    className={`resize-none rounded-[18px] border px-5 py-4 text-sm outline-none transition-all placeholder:text-neutral-400 focus:border-black ${showError("message")
+                                        ? "border-red-400 focus:border-red-400"
+                                        : "border-black/10"
+                                        }`}
                                 />
+                                {showError("message") && (
+                                    <span className="text-xs text-red-600">
+                                        {showError("message")}
+                                    </span>
+                                )}
                             </label>
 
                             {/* HONEYPOT */}

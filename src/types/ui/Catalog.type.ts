@@ -2,6 +2,7 @@ export type CatalogGroupItem = {
   label: string
   href: string
   value: string
+  children?: CatalogGroupItem[]
 }
 
 export type CatalogGroup = {

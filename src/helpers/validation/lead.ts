@@ -15,11 +15,13 @@ export const validatePhone = (value: string): string | undefined => {
 
 export const validateEmail = (value: string): string | undefined => {
   const email = value.trim()
-  if (email && !EMAIL_RE.test(email)) return "Некорректный email"
+  if (!email) return "Введите email"
+  if (!EMAIL_RE.test(email)) return "Некорректный email"
   return undefined
 }
 
 export const validateMessage = (value: string): string | undefined => {
+  if (!value.trim()) return "Заполните поле"
   if (value.length > 4000) return "Не более 4000 символов"
   return undefined
 }

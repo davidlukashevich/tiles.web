@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react"
-import { useParams } from "react-router-dom"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { useParams, useSearchParams } from "react-router-dom"
 
 import CatalogView from "../../ui/catalog/CatalogView"
 
@@ -178,23 +178,38 @@ const CatalogContainer = () => {
     })
   }, [products, imagesMap, variantsByProduct])
 
-  // Пагинация — 9 карточек на страницу
-  const [page, setPage] = useState(1)
+  // Пагинация — 9 карточек на страницу. Страница хранится в URL (?page=N),
+  // чтобы «назад» из карточки товара возвращал на ту же страницу.
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  // Сброс на первую страницу при смене категории/подборки/фильтров
-  useEffect(() => {
-    setPage(1)
-  }, [productParams])
+  const pageParam = Number(searchParams.get("page"))
+  const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1
+
+  const setPageParam = (next: number, replace: boolean) => {
+    setSearchParams(
+      (prev) => {
+        const params = new URLSearchParams(prev)
+        if (next <= 1) params.delete("page")
+        else params.set("page", String(next))
+        return params
+      },
+      { replace },
+    )
+  }
 
   const pageCount = Math.max(
     1,
     Math.ceil(productsWithImages.length / PRODUCTS_PER_PAGE),
   )
 
-  // Не остаёмся на несуществующей странице, если список сократился
+  // Не остаёмся на несуществующей странице (список сократился) — но не трогаем,
+  // пока товары ещё грузятся, иначе собьём восстановление ?page при заходе.
   useEffect(() => {
-    if (page > pageCount) setPage(pageCount)
-  }, [page, pageCount])
+    if (!isProductsLoading && page > pageCount) {
+      setPageParam(pageCount, true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isProductsLoading, page, pageCount])
 
   const pagedProducts = useMemo(() => {
     const start = (page - 1) * PRODUCTS_PER_PAGE
@@ -217,10 +232,21 @@ const CatalogContainer = () => {
     (productIds.length > 0 && (isImagesLoading || isVariantsLoading)) ||
     (imageUrls.length > 0 && !imagesReady)
 
+  // Плавный скролл вверх — но ТОЛЬКО после того, как новая страница догрузилась
+  // (вёрстка стабильна), иначе перерисовка в скелетон гасит анимацию.
+  const scrollPendingRef = useRef(false)
+
   const handlePageChange = (next: number) => {
-    setPage(next)
-    window.scrollTo({ top: 0, behavior: "smooth" })
+    scrollPendingRef.current = true
+    setPageParam(next, true)
   }
+
+  useEffect(() => {
+    if (scrollPendingRef.current && !isLoading) {
+      scrollPendingRef.current = false
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+  }, [isLoading, page])
 
   const catalogGroups = useMemo(() => {
     return isSelectionPage
@@ -320,9 +346,11 @@ const CatalogContainer = () => {
       onResetFilters={() => {
         setFilters(initialFilters)
         setAppliedFilters(initialFilters)
+        setPageParam(1, true)
       }}
       onApplyFilters={() => {
         setAppliedFilters(filters)
+        setPageParam(1, true)
         setIsFilterOpen(false)
       }}
       onToggleFavorite={handleToggleFavorite}

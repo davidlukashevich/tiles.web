@@ -4,7 +4,8 @@ import telegram from "../assets/telegram.png"
 
 export type NavLinkItem = {
   label: string
-  href: string
+  href?: string
+  children?: NavLinkItem[]
 }
 
 export type NavGroup = {
@@ -137,19 +138,23 @@ export const navigation: NavItem[] = [
 ]
 
 export const socialLinks: SocialLink[] = [
-  { label: "Viber", href: "https://viber.com", img: viber },
-  { label: "Kufar", href: "https://kufar.by", img: kufar },
+  { label: "Viber", href: "https://invite.viber.com/?g2=AQBrYsk0U9HR7E7kqW8mB2B7%2BjO58CRdE7FNq18DI1vchPl2j%2Fg3N6qMHTt9BlrU&lang=pl", img: viber },
+  { label: "Kufar", href: "https://www.kufar.by/user/OvIl4pMf5MitD1nz_o3aRWo?previousUrl=https%3A%2F%2Fwww.kufar.by%2Fitem%2F1057720139&widgetPosition=upper", img: kufar },
   { label: "Telegram", href: "https://web.telegram.org/", img: telegram },
 ]
 
 export const companyInfo = {
   brandName: "Квадратный Метр",
   brandSubtitle: "Керамическая плитка",
-  phone: "+375 (29) xxx-xx-xx",
-  phoneHref: "tel:+37529xxxxxxx",
-  addressLines: ["г. Минск", "ул. Примерная, 10"],
-  workTime: "Ежедневно, с 9:00 до 20:00",
-  copyright: "© 2026 Квадратный метр. Все права защищены.",
+  phone: "+375 (33) 666-58-56",
+  phoneHref: "tel:+375336665856",
+  addressLines: ["г. Иваново", "ул.Кирова 52"],
+  workTime: [
+    "Пн: Выходной",
+    "Вт – Пт: 09:00 – 18:00",
+    "Сб – Вс: 09:00 – 15:00",
+  ],
+copyright: "© 2026 Квадратный метр. Все права защищены.",
 }
 
 export const footerLinks = {

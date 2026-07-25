@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom"
 import type { NavItem } from "../../../../data/navigation"
+import NavChildList from "./NavChildList"
 
 type MobileNavItemProps = {
   item: NavItem
@@ -69,19 +70,11 @@ export default function MobileNavItem({
                     {group.label}
                   </NavLink>
 
-                  <ul className="space-y-1">
-                    {group.children.map((child) => (
-                      <li key={child.href}>
-                        <NavLink
-                          to={child.href}
-                          onClick={onNavigate}
-                          className="block rounded-xl py-2 text-[14px] text-neutral-600 transition-colors hover:text-neutral-950"
-                        >
-                          {child.label}
-                        </NavLink>
-                      </li>
-                    ))}
-                  </ul>
+                  <NavChildList
+                    items={group.children}
+                    onNavigate={onNavigate}
+                    variant="mobile"
+                  />
                 </div>
               ))}
             </div>

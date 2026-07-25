@@ -103,7 +103,9 @@ export default function MobileMenu({
             </a>
 
             <p className="mt-2 text-[14px] text-neutral-500">
-              Ежедневно, с 9:00 до 20:00
+              Пн: Выходной <br />
+              Вт - Пт: 09:00 – 18:00 <br />
+              Сб - Вс: 09:00 - 15:00
             </p>
 
             <ul

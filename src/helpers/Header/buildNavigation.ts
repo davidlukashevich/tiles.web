@@ -1,5 +1,11 @@
-import type { NavItem } from "../../data/navigation"
+import type { NavItem, NavLinkItem } from "../../data/navigation"
 import type { Category } from "../../types/response/Category.type"
+import { splitTileCategories } from "../Catalog/tileCategories"
+
+const toLink = (category: Category): NavLinkItem => ({
+    label: category.name,
+    href: `/catalog/tiles/${category.slug}`,
+})
 
 export const buildNavigation = (
     navigation: NavItem[],
@@ -17,13 +23,19 @@ export const buildNavigation = (
                     return group
                 }
 
-                return {
-                    ...group,
-                    children: categories.map((category) => ({
-                        label: category.name,
-                        href: `/catalog/tiles/${category.slug}`,
-                    })),
+                const { main, rest } = splitTileCategories(categories)
+
+                const children: NavLinkItem[] = main.map(toLink)
+
+                // В шапке «Другие размеры» — просто ссылка на первый из остальных
+                if (rest.length) {
+                    children.push({
+                        label: "Другие размеры",
+                        href: `/catalog/tiles/${rest[0].slug}`,
+                    })
                 }
+
+                return { ...group, children }
             }),
         }
     })

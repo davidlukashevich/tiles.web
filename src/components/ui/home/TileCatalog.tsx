@@ -8,7 +8,7 @@ type Props = {
 const TileCatalog = ({ categories }: Props) => {
     return (
         <section className="px-4 py-10 md:px-6 xl:px-8">
-            <div className="mx-auto max-w-[1280px]">
+            <div className="mx-auto max-w-[1440px]">
                 <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
                     <div>
                         <p className="text-xs uppercase tracking-[0.3em] text-gray-400">

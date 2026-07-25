@@ -73,7 +73,7 @@ const CatalogView = ({
 
   return (
     <main className="bg-white py-10 xl:py-14">
-      <section className="mx-auto max-w-[1280px]">
+      <section className="mx-auto max-w-[1440px]">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-gray-400">

@@ -1,5 +1,9 @@
+import { useState } from "react"
 import { NavLink } from "react-router-dom"
-import type { CatalogGroup } from "../../../types/ui/Catalog.type"
+import type {
+  CatalogGroup,
+  CatalogGroupItem,
+} from "../../../types/ui/Catalog.type"
 import { IoIosClose } from "react-icons/io"
 
 type Props = {
@@ -58,30 +62,84 @@ const CatalogSidebarContent = ({
 
             {hasItems ? (
               <ul className="space-y-2">
-                {group.items.map((item) => {
-                  const isActive = item.value === activeValue
-
-                  return (
-                    <li key={item.value}>
-                      <NavLink
-                        to={item.href}
-                        onClick={onNavigate}
-                        className={`block w-full rounded-xl px-4 py-3 text-left text-sm transition ${isActive
-                            ? "bg-black text-white"
-                            : "text-gray-700 hover:bg-[#f3f1ec]"
-                          }`}
-                      >
-                        {item.label}
-                      </NavLink>
-                    </li>
-                  )
-                })}
+                {group.items.map((item) => (
+                  <li key={item.value}>
+                    <SidebarItem
+                      item={item}
+                      activeValue={activeValue}
+                      onNavigate={onNavigate}
+                    />
+                  </li>
+                ))}
               </ul>
             ) : null}
           </div>
         )
       })}
     </div>
+  )
+}
+
+type SidebarItemProps = {
+  item: CatalogGroupItem
+  activeValue: string
+  onNavigate?: () => void
+}
+
+const itemClass = (isActive: boolean) =>
+  `block w-full rounded-xl px-4 py-3 text-left text-sm transition ${isActive ? "bg-black text-white" : "text-gray-700 hover:bg-[#f3f1ec]"
+  }`
+
+const SidebarItem = ({ item, activeValue, onNavigate }: SidebarItemProps) => {
+  const hasChildren = Boolean(item.children?.length)
+  const childActive =
+    item.children?.some((child) => child.value === activeValue) ?? false
+  const [open, setOpen] = useState(childActive)
+
+  if (!hasChildren) {
+    return (
+      <NavLink
+        to={item.href}
+        onClick={onNavigate}
+        className={itemClass(item.value === activeValue)}
+      >
+        {item.label}
+      </NavLink>
+    )
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        className="flex w-full cursor-pointer items-center justify-between rounded-xl px-4 py-3 text-left text-sm text-gray-700 transition hover:bg-[#f3f1ec]"
+        aria-expanded={open}
+      >
+        <span>{item.label}</span>
+        <span
+          className={`text-[10px] transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+        >
+          ▼
+        </span>
+      </button>
+
+      {open ? (
+        <ul className="mt-1 ml-3 space-y-1 border-l border-black/10 pl-2">
+          {item.children?.map((sub) => (
+            <li key={sub.value}>
+              <NavLink
+                to={sub.href}
+                onClick={onNavigate}
+                className={itemClass(sub.value === activeValue)}
+              >
+                {sub.label}
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </>
   )
 }
 

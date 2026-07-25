@@ -31,7 +31,7 @@ const PurchaseInfo = () => {
 
     return (
         <section className="px-4 md:px-6 xl:px-8">
-            <div className="mx-auto max-w-[1280px]">
+            <div className="mx-auto max-w-[1440px]">
                 <div className="rounded-[24px] bg-[#f3f1ec] p-6 md:p-10 lg:p-14">
                     <div className="max-w-[760px]">
                         <p className="text-xs uppercase tracking-[0.3em] text-gray-400">
