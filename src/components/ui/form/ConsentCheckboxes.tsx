@@ -54,8 +54,6 @@ const ConsentCheckboxes = ({
             {" "}
             <Link
                 to="/privacy"
-                target="_blank"
-                rel="noreferrer"
                 className="underline underline-offset-2 hover:text-black"
             >
                 Политика обработки персональных данных

@@ -6,20 +6,16 @@ marked.setOptions({
     breaks: true,
 })
 
-// Все ссылки открываем в новой вкладке. Для внутренних (/privacy, /terms) это
-// важно из-за текстов согласий: переход в той же вкладке стёр бы заполненную
-// форму заявки. Referrer на свой же домен не режем.
+// Внешние ссылки открываем в новой вкладке — они ведут на другие сайты.
+// Внутренние (/privacy, /terms) оставляем в текущей.
 DOMPurify.addHook("afterSanitizeAttributes", (node) => {
     if (!(node instanceof HTMLAnchorElement)) return
 
     const href = node.getAttribute("href") ?? ""
-    const isExternal = /^https?:\/\//i.test(href)
-    const isInternal = href.startsWith("/")
-
-    if (!isExternal && !isInternal) return
+    if (!/^https?:\/\//i.test(href)) return
 
     node.setAttribute("target", "_blank")
-    node.setAttribute("rel", isExternal ? "noreferrer noopener" : "noopener")
+    node.setAttribute("rel", "noreferrer noopener")
 })
 
 const sanitize = (html: string) =>

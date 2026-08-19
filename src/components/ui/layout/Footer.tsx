@@ -190,8 +190,6 @@ export default function Footer({
                 <NavLink
                   key={link.href}
                   to={link.href ?? "/"}
-                  target="_blank"
-                  rel="noopener"
                   className="transition hover:text-white"
                 >
                   {link.label}
