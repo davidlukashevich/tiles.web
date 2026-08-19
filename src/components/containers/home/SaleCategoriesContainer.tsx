@@ -139,7 +139,7 @@ const SaleCategoriesContainer = () => {
       oldPrice: item.oldPrice
         ? Number(item.oldPrice.replace(/[^\d.]/g, ""))
         : undefined,
-      href: `/product/${item.id}`,
+      href: item.href,
     })
 
     setFavoriteIds(getFavorites().map((item) => item.id))

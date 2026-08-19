@@ -1,15 +1,11 @@
+import { phoneError } from "../phone"
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export const validateName = (value: string): string | undefined => {
   const name = value.trim()
   if (!name) return "Введите имя"
   if (name.length > 200) return "Не более 200 символов"
-  return undefined
-}
-
-export const validatePhone = (value: string): string | undefined => {
-  if (!value.trim()) return "Введите телефон"
-  if (value.replace(/\D/g, "").length < 7) return "Минимум 7 цифр"
   return undefined
 }
 
@@ -25,3 +21,8 @@ export const validateMessage = (value: string): string | undefined => {
   if (value.length > 4000) return "Не более 4000 символов"
   return undefined
 }
+
+// Для поля с маской: требуемая длина определяется по коду страны,
+// поэтому валидатору не нужно знать текущий режим поля (см. helpers/phone)
+export const validateMaskedPhone = (value: string): string | undefined =>
+  phoneError(value)

@@ -1,4 +1,5 @@
 import logo from "../../../assets/logo.jpg"
+import { legalEntity } from "../../../data/legal"
 import {
   companyInfo,
   footerLinks,
@@ -13,6 +14,9 @@ export default function FooterContainer() {
   const { data } = useCategories()
   const menuNavigation = buildNavigation(navigation, data)
 
+  // Год в копирайте не хардкодим, чтобы он не устарел в январе.
+  const year = new Date().getFullYear()
+
   return (
     <Footer
       logoSrc={logo}
@@ -25,7 +29,8 @@ export default function FooterContainer() {
       navigation={menuNavigation}
       socialLinks={socialLinks}
       legalLinks={footerLinks.legal}
-      copyright={companyInfo.copyright}
+      legalEntity={legalEntity}
+      copyright={`© ${year} ${companyInfo.brandName}. Все права защищены.`}
     />
   )
 }

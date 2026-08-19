@@ -5,7 +5,9 @@ import AboutUsPage from "../pages/AboutUsPage"
 import CatalogPage from "../pages/CatalogPage"
 import HomePage from "../pages/HomePage"
 import HowBuyPage from "../pages/HowBuyPage"
+import PrivacyPage from "../pages/PrivacyPage"
 import ProductPage from "../pages/ProductPage"
+import TermsPage from "../pages/TermsPage"
 
 export const router = createBrowserRouter([
   {
@@ -35,6 +37,14 @@ export const router = createBrowserRouter([
       {
         path: "/how-to-buy/:section?",
         element: <HowBuyPage />,
+      },
+      {
+        path: "privacy",
+        element: <PrivacyPage />,
+      },
+      {
+        path: "terms",
+        element: <TermsPage />,
       },
       {
         path: "*",

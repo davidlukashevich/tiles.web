@@ -66,7 +66,7 @@ const SaleCategories = ({
             return (
               <NavLink
                 key={item.id}
-                to={`/product/${item.id}`}
+                to={item.href}
                 className="group flex h-full flex-col overflow-hidden rounded-xl border-b border-black/10 bg-white transition hover:-translate-y-1 hover:shadow-xl"
               >
                 <div className="relative h-40 overflow-hidden rounded-t-xl bg-gray-100">

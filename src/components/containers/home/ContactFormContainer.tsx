@@ -2,13 +2,13 @@ import { useState } from "react"
 
 import ContactForm from "../../ui/home/ContactForm"
 import type { ContactErrors, ContactValues } from "../../ui/home/ContactForm"
-import type { ConsentState } from "../../ui/form/ConsentCheckboxes"
+import { useConsentField } from "../../../hooks/useConsentField"
 import { useSubmitLead } from "../../../hooks/useSubmitLead"
 import {
   validateEmail,
   validateMessage,
   validateName,
-  validatePhone,
+  validateMaskedPhone,
 } from "../../../helpers/validation/lead"
 
 const initialValues: ContactValues = {
@@ -18,19 +18,13 @@ const initialValues: ContactValues = {
   message: "",
 }
 
-const initialConsent: ConsentState = {
-  consent_personal_data: false,
-  consent_cross_border: false,
-  consent_policy_version: "",
-}
-
 const validate = (values: ContactValues): ContactErrors => {
   const errors: ContactErrors = {}
 
   const name = validateName(values.name)
   if (name) errors.name = name
 
-  const phone = validatePhone(values.phone)
+  const phone = validateMaskedPhone(values.phone)
   if (phone) errors.phone = phone
 
   const email = validateEmail(values.email)
@@ -44,23 +38,21 @@ const validate = (values: ContactValues): ContactErrors => {
 
 const ContactFormContainer = () => {
   const [values, setValues] = useState<ContactValues>(initialValues)
-  const [consent, setConsent] = useState<ConsentState>(initialConsent)
   const [honeypot, setHoneypot] = useState("")
   const [touched, setTouched] = useState<
     Partial<Record<keyof ContactValues, boolean>>
   >({})
 
+  const consent = useConsentField()
   const { mutate, isPending, isSuccess, data, error } = useSubmitLead()
 
   const errors = validate(values)
   const isValid = Object.keys(errors).length === 0
 
-  const consentValid =
-    consent.consent_personal_data && consent.consent_cross_border
-
-  // Кнопка блокируется только согласиями и процессом отправки.
+  // Кнопка блокируется согласиями и процессом отправки. Если тексты согласий
+  // не загрузились — consent.isValid всегда false, отправка недоступна.
   // Ошибки полей показываем инлайн, чтобы было понятно, что исправить.
-  const canSubmit = consentValid && !isPending
+  const canSubmit = consent.isValid && !isPending
 
   const handleChange = (field: keyof ContactValues, value: string) => {
     setValues((prev) => ({ ...prev, [field]: value }))
@@ -75,7 +67,7 @@ const ContactFormContainer = () => {
 
     setTouched({ name: true, phone: true, email: true, message: true })
 
-    if (!isValid || !consentValid || isPending) return
+    if (!isValid || !consent.isValid || isPending) return
 
     mutate({
       customer_name: values.name.trim(),
@@ -83,9 +75,8 @@ const ContactFormContainer = () => {
       email: values.email.trim(),
       message: values.message.trim(),
       page_url: window.location.href,
-      consent_personal_data: consent.consent_personal_data,
-      consent_cross_border: consent.consent_cross_border,
-      consent_policy_version: consent.consent_policy_version,
+      consent_personal_data: consent.value.consent_personal_data,
+      consent_cross_border: consent.value.consent_cross_border,
       _hp: honeypot,
     })
   }
@@ -99,7 +90,7 @@ const ContactFormContainer = () => {
       onChange={handleChange}
       onBlur={handleBlur}
       onHoneypotChange={setHoneypot}
-      onConsentChange={setConsent}
+      consent={consent.props}
       onSubmit={handleSubmit}
       canSubmit={canSubmit}
       isSubmitting={isPending}

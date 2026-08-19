@@ -1,5 +1,7 @@
 export type SaleItem = {
   id: string
+  // Ссылка на товар по slug названия — как в каталоге (см. helpers/slug)
+  href: string
   title: string
   subtitle: string
   description: string

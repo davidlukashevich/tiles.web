@@ -5,6 +5,7 @@ import type {
   NavLinkItem,
 } from "../../../data/navigation"
 import { FaPhone } from "react-icons/fa6"
+import type { legalEntity } from "../../../data/legal"
 import Container from "./Container"
 
 type FooterProps = {
@@ -18,6 +19,7 @@ type FooterProps = {
   navigation: NavItem[]
   socialLinks: SocialLink[]
   legalLinks: NavLinkItem[]
+  legalEntity: typeof legalEntity
   copyright: string
 }
 
@@ -32,6 +34,7 @@ export default function Footer({
   navigation,
   socialLinks,
   legalLinks,
+  legalEntity,
   copyright,
 }: FooterProps) {
   const catalogItem = navigation.find((item) => item.label === "Каталог")
@@ -43,6 +46,31 @@ export default function Footer({
   const accessoriesLinks = catalogItem?.groups?.[1]?.children ?? []
   const selectionLinks = selectionItem?.children ?? []
   const buyerLinks = howToBuyItem?.children ?? []
+
+  // Реквизиты — по строке на пункт, рендерятся столбиком.
+  const requisites = [
+    <span className="text-white/70">{legalEntity.name}</span>,
+    <>УНП {legalEntity.unp}</>,
+    <>Адрес: {legalEntity.address}</>,
+    <>
+      Тел.:{" "}
+      <a
+        href={legalEntity.phoneHref}
+        className="transition hover:text-white"
+      >
+        {legalEntity.phone}
+      </a>
+    </>,
+    <>
+      Email:{" "}
+      <a
+        href={`mailto:${legalEntity.email}`}
+        className="transition hover:text-white"
+      >
+        {legalEntity.email}
+      </a>
+    </>,
+  ]
 
   return (
     <footer className="bg-[#292625] py-14 text-white">
@@ -147,20 +175,32 @@ export default function Footer({
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-7 text-[13px] text-white/45 md:flex-row md:items-center md:justify-between">
-          <p>{copyright}</p>
+        <div className="mt-12 border-t border-white/10 pt-7 text-[13px] leading-6 text-white/45">
+          <div className="flex flex-col gap-x-12 gap-y-5 lg:flex-row lg:items-start lg:justify-between">
+            {/* РЕКВИЗИТЫ ЮРЛИЦА — столбиком */}
+            <div>
+              {requisites.map((item, index) => (
+                <p key={index}>{item}</p>
+              ))}
+            </div>
 
-          <div className="flex flex-wrap gap-5">
-            {legalLinks.map((link) => (
-              <NavLink
-                key={link.href}
-                to={link.href ?? "/"}
-                className="transition hover:text-white"
-              >
-                {link.label}
-              </NavLink>
-            ))}
+            {/* ЮРИДИЧЕСКИЕ ДОКУМЕНТЫ — в одну линию */}
+            <div className="flex flex-wrap gap-x-6 gap-y-2 lg:shrink-0">
+              {legalLinks.map((link) => (
+                <NavLink
+                  key={link.href}
+                  to={link.href ?? "/"}
+                  target="_blank"
+                  rel="noopener"
+                  className="transition hover:text-white"
+                >
+                  {link.label}
+                </NavLink>
+              ))}
+            </div>
           </div>
+
+          <p className="mt-5 text-white/30">{copyright}</p>
         </div>
       </Container>
     </footer>

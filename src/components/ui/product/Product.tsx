@@ -167,6 +167,15 @@ const ProductView = ({
         <>
             <main className="bg-white px-4 py-8 md:px-6 xl:px-8 xl:py-10">
                 <div className="mx-auto max-w-[1440px]">
+                    {/* НАЗАД — на страницу, с которой пришли (см. backHref) */}
+                    <NavLink
+                        to={backHref}
+                        className="mb-6 inline-flex items-center gap-1.5 text-[13px] text-[#66615b] transition hover:text-black"
+                    >
+                        <IoIosArrowBack className="h-4 w-4 shrink-0" />
+                        <span>Назад</span>
+                    </NavLink>
+
                     <div className="mb-6">
                         <p className="text-xs uppercase tracking-[0.3em] text-gray-400">
                             {product.category}

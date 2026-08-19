@@ -1,5 +1,7 @@
+import { usePhoneMask } from "../../../hooks/usePhoneMask"
+import PhoneFlag from "../form/PhoneFlag"
 import ConsentCheckboxes from "../form/ConsentCheckboxes"
-import type { ConsentState } from "../form/ConsentCheckboxes"
+import type { ConsentProps } from "../form/ConsentCheckboxes"
 
 export type ContactValues = {
   name: string
@@ -18,7 +20,7 @@ type Props = {
   onChange: (field: keyof ContactValues, value: string) => void
   onBlur: (field: keyof ContactValues) => void
   onHoneypotChange: (value: string) => void
-  onConsentChange: (consent: ConsentState) => void
+  consent: ConsentProps
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
   canSubmit: boolean
   isSubmitting: boolean
@@ -41,7 +43,7 @@ const ContactForm = ({
   onChange,
   onBlur,
   onHoneypotChange,
-  onConsentChange,
+  consent,
   onSubmit,
   canSubmit,
   isSubmitting,
@@ -49,6 +51,10 @@ const ContactForm = ({
   leadNumber,
   errorMessage,
 }: Props) => {
+  const phone = usePhoneMask(values.phone, (next) =>
+    onChange("phone", next),
+  )
+
   const showError = (field: keyof ContactValues) =>
     touched[field] ? errors[field] : undefined
 
@@ -101,15 +107,23 @@ const ContactForm = ({
             </div>
 
             <div className="grid gap-1.5">
-              <input
-                type="tel"
-                value={values.phone}
-                onChange={(event) => onChange("phone", event.target.value)}
-                onBlur={() => onBlur("phone")}
-                placeholder="+375 (__) ___-__-__"
-                aria-invalid={Boolean(showError("phone"))}
-                className={fieldClass(Boolean(showError("phone")))}
-              />
+              <div className="relative">
+                <input
+                  type="tel"
+                  inputMode="tel"
+                  value={values.phone}
+                  placeholder="+375 (__) ___-__-__"
+                  aria-invalid={Boolean(showError("phone"))}
+                  className={`${fieldClass(Boolean(showError("phone")))} w-full pr-12`}
+                  {...phone.handlers}
+                  onBlur={() => {
+                    phone.handlers.onBlur()
+                    onBlur("phone")
+                  }}
+                />
+
+                <PhoneFlag code={phone.countryCode} />
+              </div>
               {showError("phone") && (
                 <span className="px-1 text-xs text-red-600">
                   {showError("phone")}
@@ -123,7 +137,8 @@ const ContactForm = ({
                 value={values.email}
                 onChange={(event) => onChange("email", event.target.value)}
                 onBlur={() => onBlur("email")}
-                placeholder="Email"
+                placeholder="you@example.com"
+                aria-label="Email"
                 aria-invalid={Boolean(showError("email"))}
                 className={fieldClass(Boolean(showError("email")))}
               />
@@ -167,7 +182,7 @@ const ContactForm = ({
               className="absolute left-[-9999px] top-[-9999px] h-0 w-0 opacity-0"
             />
 
-            <ConsentCheckboxes onChange={onConsentChange} />
+            <ConsentCheckboxes {...consent} />
 
             {errorMessage && (
               <p className="text-sm text-red-600">{errorMessage}</p>
@@ -180,6 +195,10 @@ const ContactForm = ({
             >
               {isSubmitting ? "Отправка..." : "Отправить заявку"}
             </button>
+
+            <p className="text-center text-xs leading-5 text-[#8f8a84]">
+              Отправка заявки не является оплатой — с вами свяжется менеджер.
+            </p>
           </form>
         )}
       </div>

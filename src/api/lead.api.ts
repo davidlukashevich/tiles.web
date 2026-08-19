@@ -12,7 +12,6 @@ export type LeadPayload = {
     product_name?: string
     consent_personal_data: boolean
     consent_cross_border: boolean
-    consent_policy_version?: string
     _hp?: string
 }
 

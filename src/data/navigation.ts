@@ -154,12 +154,11 @@ export const companyInfo = {
     "Вт – Пт: 09:00 – 18:00",
     "Сб – Вс: 09:00 – 15:00",
   ],
-copyright: "© 2026 Квадратный метр. Все права защищены.",
 }
 
 export const footerLinks = {
   legal: [
-    { label: "Политика конфиденциальности", href: "/privacy" },
-    { label: "Пользовательское соглашение", href: "/terms" },
+    { label: "Политика обработки персональных данных", href: "/privacy" },
+    { label: "Условия оформления заявки", href: "/terms" },
   ],
 }

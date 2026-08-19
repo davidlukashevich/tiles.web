@@ -1,11 +1,14 @@
 import { useEffect } from "react"
 import { IoIosClose } from "react-icons/io"
+import { usePhoneMask } from "../../../hooks/usePhoneMask"
+import PhoneFlag from "../form/PhoneFlag"
 import ConsentCheckboxes from "../form/ConsentCheckboxes"
-import type { ConsentState } from "../form/ConsentCheckboxes"
+import type { ConsentProps } from "../form/ConsentCheckboxes"
 
 export type RequestValues = {
     name: string
     phone: string
+    email: string
     message: string
 }
 
@@ -22,7 +25,7 @@ type Props = {
     onChange: (field: keyof RequestValues, value: string) => void
     onBlur: (field: keyof RequestValues) => void
     onHoneypotChange: (value: string) => void
-    onConsentChange: (consent: ConsentState) => void
+    consent: ConsentProps
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
     canSubmit: boolean
     isSubmitting: boolean
@@ -46,7 +49,7 @@ const RequestModal = ({
     onChange,
     onBlur,
     onHoneypotChange,
-    onConsentChange,
+    consent,
     onSubmit,
     canSubmit,
     isSubmitting,
@@ -61,6 +64,9 @@ const RequestModal = ({
             document.body.style.overflow = ""
         }
     }, [isOpen])
+
+    // Хук обязан вызываться до раннего return ниже
+    const phone = usePhoneMask(values.phone, (next) => onChange("phone", next))
 
     if (!isOpen) return null
 
@@ -149,18 +155,47 @@ const RequestModal = ({
                             {/* PHONE */}
                             <label className="grid gap-2">
                                 <span className="text-sm text-neutral-500">Телефон</span>
-                                <input
-                                    type="tel"
-                                    value={values.phone}
-                                    onChange={(event) => onChange("phone", event.target.value)}
-                                    onBlur={() => onBlur("phone")}
-                                    placeholder="+375 (__) ___-__-__"
-                                    aria-invalid={Boolean(showError("phone"))}
-                                    className={fieldClass(Boolean(showError("phone")))}
-                                />
+                                <div className="relative">
+                                    <input
+                                        type="tel"
+                                        inputMode="tel"
+                                        value={values.phone}
+                                        placeholder="+375 (__) ___-__-__"
+                                        aria-invalid={Boolean(showError("phone"))}
+                                        className={`${fieldClass(Boolean(showError("phone")))} w-full pr-12`}
+                                        {...phone.handlers}
+                                        onBlur={() => {
+                                            phone.handlers.onBlur()
+                                            onBlur("phone")
+                                        }}
+                                    />
+
+                                    <PhoneFlag code={phone.countryCode} />
+                                </div>
                                 {showError("phone") && (
                                     <span className="text-xs text-red-600">
                                         {showError("phone")}
+                                    </span>
+                                )}
+                            </label>
+
+                            {/* EMAIL */}
+                            <label className="grid gap-2">
+                                <span className="text-sm text-neutral-500">Email</span>
+                                <input
+                                    type="email"
+                                    inputMode="email"
+                                    maxLength={200}
+                                    value={values.email}
+                                    onChange={(event) => onChange("email", event.target.value)}
+                                    onBlur={() => onBlur("email")}
+                                    placeholder="you@example.com"
+                                    aria-invalid={Boolean(showError("email"))}
+                                    className={fieldClass(Boolean(showError("email")))}
+                                />
+                                {showError("email") && (
+                                    <span className="text-xs text-red-600">
+                                        {showError("email")}
                                     </span>
                                 )}
                             </label>
@@ -202,7 +237,7 @@ const RequestModal = ({
                             />
 
                             {/* CONSENTS */}
-                            <ConsentCheckboxes onChange={onConsentChange} />
+                            <ConsentCheckboxes {...consent} />
 
                             {errorMessage && (
                                 <p className="text-sm text-red-600">{errorMessage}</p>
@@ -216,6 +251,11 @@ const RequestModal = ({
                             >
                                 {isSubmitting ? "Отправка..." : "Отправить заявку"}
                             </button>
+
+                            <p className="text-center text-xs leading-5 text-neutral-500">
+                                Отправка заявки не является оплатой — с вами
+                                свяжется менеджер.
+                            </p>
                         </form>
                     </>
                 )}
