@@ -1,3 +1,5 @@
+import { useMarkdownLinks } from "../../../hooks/useMarkdownLinks"
+
 type Props = {
     title: string
     subtitle?: string
@@ -30,6 +32,8 @@ const LegalDocumentView = ({
     isLoading,
     isError,
 }: Props) => {
+    const handleMarkdownClick = useMarkdownLinks()
+
     const publishedLabel = publishedAt ? formatDate(publishedAt) : null
 
     return (
@@ -86,6 +90,7 @@ const LegalDocumentView = ({
                     {!isLoading && !isError && html ? (
                         <div
                             className="legal-content"
+                            onClick={handleMarkdownClick}
                             dangerouslySetInnerHTML={{ __html: html }}
                         />
                     ) : null}

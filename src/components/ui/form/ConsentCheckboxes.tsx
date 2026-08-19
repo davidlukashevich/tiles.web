@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom"
 
+import { useMarkdownLinks } from "../../../hooks/useMarkdownLinks"
+
 export type ConsentState = {
     consent_personal_data: boolean
     consent_cross_border: boolean
@@ -31,6 +33,9 @@ const ConsentCheckboxes = ({
     isLoading,
     isUnavailable,
 }: ConsentProps) => {
+    // Ссылки внутри текста из БД — обычные <a>, ведём их через роутер
+    const handleMarkdownClick = useMarkdownLinks()
+
     if (isLoading) {
         return (
             <div className="grid gap-3">
@@ -78,6 +83,7 @@ const ConsentCheckboxes = ({
                 <span>
                     <span
                         className="legal-inline"
+                        onClick={handleMarkdownClick}
                         dangerouslySetInnerHTML={{
                             __html: personalDataHtml ?? "",
                         }}
@@ -101,6 +107,7 @@ const ConsentCheckboxes = ({
                 <span>
                     <span
                         className="legal-inline"
+                        onClick={handleMarkdownClick}
                         dangerouslySetInnerHTML={{
                             __html: crossBorderHtml ?? "",
                         }}
