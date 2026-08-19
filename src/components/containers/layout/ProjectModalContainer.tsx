@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import { useLocation } from "react-router-dom"
 
 import ProjectModal from "../../ui/modal/ProjectModal"
 import type { ProjectErrors, ProjectValues } from "../../ui/modal/ProjectModal"
@@ -42,6 +43,18 @@ const ProjectModalContainer = ({ isOpen, onClose }: Props) => {
   const [touched, setTouched] = useState<
     Partial<Record<keyof ProjectValues, boolean>>
   >({})
+
+  // Модалка монтируется в Header, то есть вне <Outlet />, и смену маршрута
+  // переживает. Закрываем сами, иначе она остаётся висеть над новой
+  // страницей — например при переходе в политику из галочки согласия.
+  const location = useLocation()
+  const pathnameRef = useRef(location.pathname)
+
+  useEffect(() => {
+    if (pathnameRef.current === location.pathname) return
+    pathnameRef.current = location.pathname
+    if (isOpen) onClose()
+  }, [location.pathname, isOpen, onClose])
 
   const consent = useConsentField()
   const { mutate, isPending, isSuccess, data, error, reset } = useSubmitLead()
