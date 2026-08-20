@@ -18,11 +18,16 @@ import { useCategories } from "../../../hooks/useCategories"
 import {
   useProductImages,
   useProducts,
-  useProductVariants,
+  useVariantIndex,
 } from "../../../hooks/useProducts"
 import { useImagesReady } from "../../../hooks/useImagesReady"
 import { productHrefBySlug } from "../../../helpers/slug"
-import { computeDisplayPrice } from "../../../helpers/price"
+import { byDisplayPriceAsc, computeDisplayPrice } from "../../../helpers/price"
+import { matchesSearch } from "../../../helpers/Catalog/matchesSearch"
+import {
+  normalizeSize,
+  sizeFromCategoryName,
+} from "../../../helpers/Catalog/sizeMatch"
 import type { ProductQueryParams } from "../../../api/product.api"
 
 import { buildCatalogGroups } from "../../../helpers/Catalog/buildCatalogGroups"
@@ -36,9 +41,6 @@ const initialFilters: CatalogFilters = {
   formats: [],
   surfaceTypes: [],
 }
-
-const PRODUCT_PLACEHOLDER_IMAGE =
-  "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80"
 
 const PRODUCTS_PER_PAGE = 9
 
@@ -86,7 +88,10 @@ const CatalogContainer = () => {
     const priceTo = Number(appliedFilters.priceTo)
 
     return {
-      categorySlug: isSelectionPage ? undefined : categorySlug,
+      // categorySlug тут не передаём: товар должен попадать в категорию
+      // и по размеру своего варианта, а нормализовать «х»/«x» в SQL нельзя.
+      // Поэтому грузим выборку целиком и отбираем на клиенте (см. ниже).
+      categorySlug: undefined,
       collectionName: isSelectionPage ? collectionName : undefined,
       onSale: isSalePage ? true : undefined,
       manufacturers: appliedFilters.manufacturers,
@@ -101,48 +106,84 @@ const CatalogContainer = () => {
           ? priceTo
           : undefined,
     }
-  }, [isSelectionPage, isSalePage, categorySlug, collectionName, appliedFilters])
+  }, [isSelectionPage, isSalePage, collectionName, appliedFilters])
 
   const { data: productsData = [], isLoading: isProductsLoading } =
     useProducts(productParams, { enabled: productsEnabled })
 
   // Если запрос выключен (например, корень «Сопутствующие товары»),
   // не показываем данные, даже если они лежат в кэше по такому же ключу.
-  const products = productsEnabled ? productsData : []
+  const allProducts = productsEnabled ? productsData : []
 
-  const productIds = useMemo(() => {
-    return products.map((product) => product.id)
-  }, [products])
+  // Один запрос вариантов на весь каталог вместо .in("id", [...]) на всю
+  // выборку: тот URL занимал 18,5 КБ и с ~700 товаров начал бы падать.
+  const { data: variantIndex = [], isLoading: isVariantsLoading } =
+    useVariantIndex()
 
-  const { data: productImages = [], isLoading: isImagesLoading } =
-    useProductImages(productIds)
-
-  const { data: productVariants = [], isLoading: isVariantsLoading } =
-    useProductVariants(productIds)
-
-  const imagesMap = useMemo(() => {
-    const map = new Map<string, string>()
-
-    productImages.forEach((image) => {
-      if (!map.has(image.product_id)) {
-        map.set(image.product_id, image.image_url)
-      }
-    })
-
-    return map
-  }, [productImages])
-
-  // product_id -> варианты (для размеров/поверхностей/флагов/цены)
+  // product_id -> его варианты (цена, размеры, поверхности, флаги)
   const variantsByProduct = useMemo(() => {
-    const map = new Map<string, typeof productVariants>()
-    productVariants.forEach((variant) => {
+    const map = new Map<string, typeof variantIndex>()
+
+    variantIndex.forEach((variant) => {
       const list = map.get(variant.product_id) ?? []
       list.push(variant)
       map.set(variant.product_id, list)
     })
-    return map
-  }, [productVariants])
 
+    return map
+  }, [variantIndex])
+
+  // product_id -> размеры его вариантов (нормализованные)
+  const sizesByProduct = useMemo(() => {
+    const map = new Map<string, Set<string>>()
+
+    variantIndex.forEach(({ product_id, size_name }) => {
+      if (!size_name) return
+      const set = map.get(product_id) ?? new Set<string>()
+      set.add(normalizeSize(size_name))
+      map.set(product_id, set)
+    })
+
+    return map
+  }, [variantIndex])
+
+  // Размер текущей категории берём из названия, а не из slug: slug'и в БД
+  // местами разошлись с названиями («Плитка 100x100» -> slug «plitka»).
+  const categorySize = useMemo(() => {
+    if (!categorySlug) return ""
+
+    const fromCategories = categories.find(
+      (category) => category.slug === categorySlug,
+    )
+
+    if (fromCategories) return sizeFromCategoryName(fromCategories.name)
+
+    // Фолбэк на случай, если категории ещё не пришли
+    const fromProducts = productsData.find(
+      (product) => product.category_slug === categorySlug,
+    )
+
+    return fromProducts
+      ? sizeFromCategoryName(fromProducts.category_name ?? "")
+      : ""
+  }, [categories, productsData, categorySlug])
+
+  // Товар виден в категории, если он к ней привязан ИЛИ у него есть вариант
+  // такого размера. Объединение, а не замена: иначе товар пропал бы из своей
+  // же категории, когда среди вариантов нет её размера.
+  const products = useMemo(() => {
+    if (!allProducts.length || !categorySlug) return allProducts
+
+    return allProducts.filter(
+      (product) =>
+        product.category_slug === categorySlug ||
+        (categorySize !== "" &&
+          sizesByProduct.get(product.id)?.has(categorySize)),
+    )
+  }, [allProducts, categorySlug, categorySize, sizesByProduct])
+
+  // Карточки строим без картинок: они нужны только для видимых девяти,
+  // а запрос за ними уходит уже после пагинации (см. ниже).
   const productsWithImages = useMemo<CatalogCardProduct[]>(() => {
     return products.map((product) => {
       const variants = variantsByProduct.get(product.id) ?? []
@@ -166,7 +207,7 @@ const CatalogContainer = () => {
 
       return {
         ...product,
-        image_url: imagesMap.get(product.id) ?? null,
+        image_url: null,
         sizes,
         surfaces,
         isOnSale: variants.some((v) => v.is_on_sale),
@@ -176,11 +217,30 @@ const CatalogContainer = () => {
         priceIsFrom: display.isFrom,
       }
     })
-  }, [products, imagesMap, variantsByProduct])
+  }, [products, variantsByProduct])
 
-  // Пагинация — 9 карточек на страницу. Страница хранится в URL (?page=N),
-  // чтобы «назад» из карточки товара возвращал на ту же страницу.
+  // Страница и поисковый запрос живут в URL (?page=N&q=...), чтобы «назад»
+  // из карточки товара возвращал к тем же результатам.
   const [searchParams, setSearchParams] = useSearchParams()
+
+  const search = searchParams.get("q") ?? ""
+
+  // Поиск по названию — до сортировки и пагинации, иначе фильтровалась бы
+  // только текущая страница.
+  const foundProducts = useMemo(
+    () =>
+      productsWithImages.filter((product) =>
+        matchesSearch(product.name, search),
+      ),
+    [productsWithImages, search],
+  )
+
+  // Всегда от дешёвых к дорогим. Сортируем до пагинации, иначе порядок
+  // получился бы только внутри страницы.
+  const sortedProducts = useMemo(
+    () => [...foundProducts].sort(byDisplayPriceAsc),
+    [foundProducts],
+  )
 
   const pageParam = Number(searchParams.get("page"))
   const page = Number.isFinite(pageParam) && pageParam > 0 ? pageParam : 1
@@ -197,9 +257,24 @@ const CatalogContainer = () => {
     )
   }
 
+  // Новый запрос — всегда с первой страницы. replace, чтобы набор текста
+  // не забивал историю браузера.
+  const handleSearchChange = (next: string) => {
+    setSearchParams(
+      (prev) => {
+        const params = new URLSearchParams(prev)
+        if (next.trim()) params.set("q", next)
+        else params.delete("q")
+        params.delete("page")
+        return params
+      },
+      { replace: true },
+    )
+  }
+
   const pageCount = Math.max(
     1,
-    Math.ceil(productsWithImages.length / PRODUCTS_PER_PAGE),
+    Math.ceil(sortedProducts.length / PRODUCTS_PER_PAGE),
   )
 
   // Не остаёмся на несуществующей странице (список сократился) — но не трогаем,
@@ -211,10 +286,41 @@ const CatalogContainer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isProductsLoading, page, pageCount])
 
-  const pagedProducts = useMemo(() => {
+  const pageProducts = useMemo(() => {
     const start = (page - 1) * PRODUCTS_PER_PAGE
-    return productsWithImages.slice(start, start + PRODUCTS_PER_PAGE)
-  }, [productsWithImages, page])
+    return sortedProducts.slice(start, start + PRODUCTS_PER_PAGE)
+  }, [sortedProducts, page])
+
+  // Картинки запрашиваем только для девяти видимых товаров: URL получается
+  // ~350 байт вместо 18,5 КБ на всю выборку.
+  const pageProductIds = useMemo(
+    () => pageProducts.map((product) => product.id),
+    [pageProducts],
+  )
+
+  const { data: productImages = [], isLoading: isImagesLoading } =
+    useProductImages(pageProductIds)
+
+  const imagesMap = useMemo(() => {
+    const map = new Map<string, string>()
+
+    productImages.forEach((image) => {
+      if (!map.has(image.product_id)) {
+        map.set(image.product_id, image.image_url)
+      }
+    })
+
+    return map
+  }, [productImages])
+
+  const pagedProducts = useMemo(
+    () =>
+      pageProducts.map((product) => ({
+        ...product,
+        image_url: imagesMap.get(product.id) ?? null,
+      })),
+    [pageProducts, imagesMap],
+  )
 
   // Предзагружаем картинки только текущей страницы
   const imageUrls = useMemo(() => {
@@ -229,7 +335,8 @@ const CatalogContainer = () => {
   // физически не догрузились в браузере — показываем состояние загрузки.
   const isLoading =
     isProductsLoading ||
-    (productIds.length > 0 && (isImagesLoading || isVariantsLoading)) ||
+    isVariantsLoading ||
+    (pageProductIds.length > 0 && isImagesLoading) ||
     (imageUrls.length > 0 && !imagesReady)
 
   // Плавный скролл вверх — но ТОЛЬКО после того, как новая страница догрузилась
@@ -300,7 +407,7 @@ const CatalogContainer = () => {
       id: product.id,
       title: product.name,
       category: product.category_name,
-      image: product.image_url ?? PRODUCT_PLACEHOLDER_IMAGE,
+      image: product.image_url ?? "",
       price: product.price_from ?? 0,
       oldPrice: undefined,
       href: productHrefBySlug(product.name),
@@ -327,6 +434,9 @@ const CatalogContainer = () => {
     <CatalogView
       groups={catalogGroups}
       products={pagedProducts}
+      search={search}
+      foundCount={sortedProducts.length}
+      onSearchChange={handleSearchChange}
       isLoading={isLoading}
       page={page}
       pageCount={pageCount}

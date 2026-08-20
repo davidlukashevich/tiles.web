@@ -138,7 +138,7 @@ export const navigation: NavItem[] = [
 ]
 
 export const socialLinks: SocialLink[] = [
-  { label: "Viber", href: "https://invite.viber.com/?g2=AQBrYsk0U9HR7E7kqW8mB2B7%2BjO58CRdE7FNq18DI1vchPl2j%2Fg3N6qMHTt9BlrU&lang=pl", img: viber },
+  { label: "Viber", href: "https://invite.viber.com/?g2=AQBrYsk0U9HR7E7kqW8mB2B7%2BjO58CRdE7FNq18DI1vchPl2j%2Fg3N6qMHTt9BlrU", img: viber },
   { label: "Kufar", href: "https://www.kufar.by/user/OvIl4pMf5MitD1nz_o3aRWo?previousUrl=https%3A%2F%2Fwww.kufar.by%2Fitem%2F1057720139&widgetPosition=upper", img: kufar },
   { label: "Telegram", href: "https://web.telegram.org/", img: telegram },
 ]

@@ -1,4 +1,6 @@
 import { useState } from "react"
+
+import { useHeaderHeight } from "../../../hooks/useHeaderHeight"
 import { IoIosArrowForward } from "react-icons/io"
 import type { HowBuySection } from "../../../types/ui/HowBuy.type"
 import MobileTabs from "./MobileTabs"
@@ -14,6 +16,9 @@ const HowBuyView = ({
     activeSectionId,
     onTabClick,
 }: Props) => {
+    // Табы липнут ровно под хедер — без зазора на любой ширине
+    useHeaderHeight()
+
     const [openItem, setOpenItem] = useState<string | null>(null)
 
     const handleToggleItem = (id: string) => {
@@ -34,7 +39,10 @@ const HowBuyView = ({
                     </p>
                 </div>
 
-                <div className="sticky top-[104px] z-40 mb-8 bg-white/90 py-3 backdrop-blur lg:top-[90px] lg:mb-14 lg:py-4">
+                <div
+                    className="sticky z-40 mb-8 bg-white/90 py-3 backdrop-blur lg:mb-14 lg:py-4"
+                    style={{ top: "var(--header-height, 0px)" }}
+                >
                     <div className="hidden justify-center lg:flex">
                         <div className="flex gap-2 rounded-[28px] bg-[#f3f0ea] p-2">
                             {sections.map((section) => {

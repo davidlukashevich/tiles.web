@@ -6,7 +6,6 @@ import PurchaseInfo from "../components/ui/home/Purchase"
 const HomePage = () => {
     return (
         <div>
-            {/* <TileCatalogContainer /> */}
             <SaleCategoriesContainer />
             <AboutUs />
             <PurchaseInfo />

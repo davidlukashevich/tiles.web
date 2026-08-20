@@ -52,3 +52,32 @@ export const computeDisplayPrice = (
     isFrom: distinctFinals.size > 1,
   }
 }
+
+type PricedProduct = {
+  displayPrice?: number | null
+  name: string
+}
+
+// Сортировка списка товаров по показанной цене, от дешёвой к дорогой.
+//
+// Сортируем именно по displayPrice (минимальная цена со скидкой среди
+// вариантов), потому что это то число, которое пользователь видит на карточке.
+// Товары без цены («Цена по запросу») уходят в конец: иначе null встал бы
+// перед самыми дешёвыми.
+export const byDisplayPriceAsc = (
+  a: PricedProduct,
+  b: PricedProduct,
+): number => {
+  const left = a.displayPrice ?? null
+  const right = b.displayPrice ?? null
+
+  if (left === null || right === null) {
+    if (left === right) return a.name.localeCompare(b.name)
+    return left === null ? 1 : -1
+  }
+
+  if (left !== right) return left - right
+
+  // Одинаковая цена — по названию, чтобы порядок не «прыгал» между рендерами
+  return a.name.localeCompare(b.name)
+}

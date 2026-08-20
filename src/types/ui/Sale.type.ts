@@ -12,13 +12,3 @@ export type SaleItem = {
 
   isSale?: boolean
 }
-
-export type SaleProduct = {
-  id: number
-  title: string
-  size: string
-  category: string
-  oldPrice: number
-  price: number
-  image: string
-}

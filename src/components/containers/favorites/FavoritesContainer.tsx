@@ -1,22 +1,15 @@
 import { useEffect, useState } from "react"
 import FavoritesDrawer from "../../ui/favorites/FavoritesDrawer"
 import type { FavoriteProduct } from "../../../types/ui/Favorite.type"
-
-const FAVORITES_KEY = "favoriteProducts"
+import {
+  getFavorites,
+  removeFavorite,
+} from "../../../helpers/Favorite/favorite"
 
 type Props = {
     isOpen: boolean
     onClose: () => void
     onChangeCount: (count: number) => void
-}
-
-const getFavorites = (): FavoriteProduct[] => {
-    try {
-        const value = localStorage.getItem(FAVORITES_KEY)
-        return value ? JSON.parse(value) : []
-    } catch {
-        return []
-    }
 }
 
 const FavoritesContainer = ({
@@ -53,13 +46,10 @@ const FavoritesContainer = ({
     }, [isOpen])
 
     const handleRemove = (id: string) => {
-        const nextFavorites = favorites.filter((item) => item.id !== id)
+        const nextFavorites = removeFavorite(id)
 
-        localStorage.setItem(FAVORITES_KEY, JSON.stringify(nextFavorites))
         setFavorites(nextFavorites)
         onChangeCount(nextFavorites.length)
-
-        window.dispatchEvent(new Event("favorites:changed"))
     }
 
     return (

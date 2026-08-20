@@ -3,6 +3,7 @@ import {
   getProductById,
   getProductImagesByProductIds,
   getProductIndex,
+  getVariantIndex,
   getProducts,
   getProductVariantsByProductIds,
   resolveProductId,
@@ -60,6 +61,16 @@ export const useProduct = (identifier: string) => {
     // пока грузится индекс — считаем это загрузкой товара
     isLoading: isIndexLoading || (Boolean(id) && query.isLoading),
   }
+}
+
+// Индекс вариантов по всему каталогу — меняется редко, держим в кэше
+// на сессию. Заменяет в каталоге запрос вариантов списком id.
+export const useVariantIndex = () => {
+  return useQuery({
+    queryKey: ["variant-index"],
+    queryFn: getVariantIndex,
+    staleTime: Infinity,
+  })
 }
 
 export const useProductVariants = (productIds: string[]) => {

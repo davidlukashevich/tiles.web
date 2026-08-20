@@ -154,6 +154,38 @@ export const resolveProductId = (
     return bySku?.id
 }
 
+export type VariantIndexItem = {
+    product_id: string
+    size_name: string | null
+    surface_name: string | null
+    price: number | null
+    discount_percent: number | null
+    is_on_sale: boolean
+    is_recommended: boolean
+}
+
+// Индекс вариантов по всему каталогу (около 600 строк) одним запросом
+// БЕЗ фильтра по id.
+//
+// Так каталогу не нужен .in("id", [...]) на все товары выборки: такой URL
+// на 476 товарах занимает 18,5 КБ, а с 700 товаров Supabase отвечает 400.
+// Из индекса берём цену для сортировки, размеры, поверхности и флаги.
+//
+// Порядок (sort_order, id) обязателен: в нём перечисляются размеры
+// и поверхности на карточке товара.
+export const getVariantIndex = async (): Promise<VariantIndexItem[]> => {
+    const { data, error } = await supabase
+        .from("public_product_variants_view")
+        .select(
+            "product_id, size_name, surface_name, price, discount_percent, is_on_sale, is_recommended",
+        )
+        .order("sort_order")
+        .order("id")
+
+    if (error) throw new Error(error.message)
+    return (data ?? []) as VariantIndexItem[]
+}
+
 export const getProductImagesByProductIds = async (
     productIds: string[],
 ): Promise<ProductImage[]> => {

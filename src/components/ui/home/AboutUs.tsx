@@ -1,14 +1,15 @@
 import { NavLink } from "react-router-dom"
 
+import bedroom from "../../../assets/bedroom.jpg"
+
 const AboutUs = () => {
     return (
         <section className="px-4 pb-10 md:px-6 xl:px-8">
             <div className="mx-auto max-w-[1440px]">
-                <div className="relative overflow-hidden rounded-2xl bg-[#f3f1ec] p-6 md:p-10 lg:p-14">
-                    <div className="pointer-events-none absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-black/20 to-transparent" />
+                <div className="relative overflow-hidden rounded-2xl bg-[#f3f1ec]">
 
-                    <div className="grid gap-6 lg:grid-cols-2 lg:items-center">
-                        <div>
+                    <div className="grid gap-6 lg:grid-cols-2 lg:gap-0">
+                        <div className="p-6 md:p-10 lg:p-14">
                             <p className="text-xs uppercase tracking-[0.3em] text-gray-400">
                                 О нас
                             </p>
@@ -37,11 +38,8 @@ const AboutUs = () => {
                         </div>
 
                         <div
-                            className="h-[260px] md:h-[320px] rounded-xl bg-cover bg-center"
-                            style={{
-                                backgroundImage:
-                                    "url('https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80')",
-                            }}
+                            className="min-h-[260px] bg-cover bg-center md:min-h-[320px] lg:min-h-full"
+                            style={{ backgroundImage: `url(${bedroom})` }}
                         />
                     </div>
                 </div>

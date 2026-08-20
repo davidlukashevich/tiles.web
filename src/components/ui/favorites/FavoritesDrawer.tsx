@@ -1,5 +1,7 @@
+import { useState } from "react"
 import { NavLink } from "react-router-dom"
 import { IoIosClose } from "react-icons/io"
+import { FaRegImage } from "react-icons/fa6"
 import type { FavoriteProduct } from "../../../types/ui/Favorite.type"
 
 type Props = {
@@ -7,6 +9,31 @@ type Props = {
     favorites: FavoriteProduct[]
     onClose: () => void
     onRemove: (id: string) => void
+}
+
+// Миниатюра товара в избранном. Если фото нет или оно не загрузилось —
+// показываем тот же блок «Нет фото», что и карточка каталога, а не чужую
+// картинку-заглушку.
+const FavoriteThumb = ({ src, alt }: { src: string; alt: string }) => {
+    const [hasError, setHasError] = useState(false)
+
+    if (!src || hasError) {
+        return (
+            <div className="flex aspect-square h-full w-full flex-col items-center justify-center gap-1 bg-neutral-100 text-neutral-400">
+                <FaRegImage className="h-5 w-5" />
+                <span className="text-[10px] font-medium">Нет фото</span>
+            </div>
+        )
+    }
+
+    return (
+        <img
+            src={src}
+            alt={alt}
+            onError={() => setHasError(true)}
+            className="aspect-square h-full w-full object-cover"
+        />
+    )
 }
 
 const FavoritesDrawer = ({
@@ -66,10 +93,9 @@ const FavoritesDrawer = ({
                                         onClick={onClose}
                                         className="overflow-hidden rounded-[16px] bg-neutral-200"
                                     >
-                                        <img
+                                        <FavoriteThumb
                                             src={item.image}
                                             alt={item.title}
-                                            className="aspect-square h-full w-full object-cover"
                                         />
                                     </NavLink>
 

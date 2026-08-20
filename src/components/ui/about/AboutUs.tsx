@@ -11,7 +11,7 @@ type Props = {
 const socialLinks = [
     {
         label: "Viber",
-        href: "https://invite.viber.com/?g2=AQBrYsk0U9HR7E7kqW8mB2B7%2BjO58CRdE7FNq18DI1vchPl2j%2Fg3N6qMHTt9BlrU&lang=pl",
+        href: "https://invite.viber.com/?g2=AQBrYsk0U9HR7E7kqW8mB2B7%2BjO58CRdE7FNq18DI1vchPl2j%2Fg3N6qMHTt9BlrU",
         img: viberIcon,
     },
     {

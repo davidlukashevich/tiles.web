@@ -1,5 +1,8 @@
 import { useEffect } from "react"
 import CatalogFilterModal from "./CatalogFilterModal"
+import { FaMagnifyingGlass } from "react-icons/fa6"
+import { IoIosClose } from "react-icons/io"
+
 import CatalogPagination from "./CatalogPagination"
 import CatalogProductCard from "./CatalogProductCard"
 import CatalogProductSkeleton from "./CatalogProductSkeleton"
@@ -15,6 +18,10 @@ import type { CatalogCardProduct } from "../../../types/response/Product.type"
 type Props = {
   groups: CatalogGroup[]
   products: CatalogCardProduct[]
+  search: string
+  // Сколько товаров нашлось всего, а не на текущей странице
+  foundCount: number
+  onSearchChange: (value: string) => void
   isLoading: boolean
   page: number
   pageCount: number
@@ -42,6 +49,9 @@ type Props = {
 const CatalogView = ({
   groups,
   products,
+  search,
+  foundCount,
+  onSearchChange,
   isLoading,
   page,
   pageCount,
@@ -123,6 +133,41 @@ const CatalogView = ({
           />
 
           <div className="min-w-0">
+            {/* ПОИСК — над сеткой, фильтрует всю выборку, а не текущую страницу */}
+            <div className="mb-5">
+              <div className="relative">
+                <FaMagnifyingGlass className="pointer-events-none absolute left-5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+
+                <input
+                  type="search"
+                  value={search}
+                  onChange={(event) => onSearchChange(event.target.value)}
+                  placeholder="Поиск по названию"
+                  aria-label="Поиск по названию товара"
+                  className="h-12 w-full rounded-[18px] border border-black/10 bg-white pl-12 pr-12 text-[15px] outline-none placeholder:text-gray-400 focus:border-black"
+                />
+
+                {search ? (
+                  <button
+                    type="button"
+                    onClick={() => onSearchChange("")}
+                    aria-label="Очистить поиск"
+                    className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full text-gray-400 transition hover:bg-[#f3f1ec] hover:text-black"
+                  >
+                    <IoIosClose className="h-6 w-6" />
+                  </button>
+                ) : null}
+              </div>
+
+              {search && !isLoading ? (
+                <p className="mt-2 px-1 text-xs text-gray-500">
+                  {foundCount > 0
+                    ? `Найдено: ${foundCount}`
+                    : "Ничего не найдено"}
+                </p>
+              ) : null}
+            </div>
+
             {isLoading ? (
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 2xl:grid-cols-3">
                 {Array.from({ length: 6 }).map((_, index) => (
@@ -150,7 +195,20 @@ const CatalogView = ({
               </>
             ) : (
               <div className="rounded-[24px] bg-[#f3f1ec] p-8 text-center text-gray-600">
-                Товары не найдены
+                {search ? (
+                  <>
+                    По запросу «{search}» ничего не нашлось.
+                    <button
+                      type="button"
+                      onClick={() => onSearchChange("")}
+                      className="ml-1 cursor-pointer underline underline-offset-2 hover:text-black"
+                    >
+                      Сбросить поиск
+                    </button>
+                  </>
+                ) : (
+                  "Товары не найдены"
+                )}
               </div>
             )}
           </div>
