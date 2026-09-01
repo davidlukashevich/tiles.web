@@ -57,3 +57,6 @@ public/temp
 
 # prisma (если используешь)
 prisma/dev.db
+
+# Claude Code (локальная конфигурация, в репозиторий не нужна)
+.claude/
