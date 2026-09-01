@@ -17,15 +17,22 @@ type SidebarContentProps = {
   groups: CatalogGroup[]
   activeValue: string
   onNavigate?: () => void
+  // В мобильной панели карточка не нужна: рамка внутри рамки
+  bare?: boolean
 }
 
 const CatalogSidebarContent = ({
   groups,
   activeValue,
   onNavigate,
+  bare = false,
 }: SidebarContentProps) => {
   return (
-    <div className="rounded-[24px] border border-black/10 bg-white p-5">
+    <div
+      className={
+        bare ? "" : "rounded-[24px] border border-black/10 bg-white p-5"
+      }
+    >
       {groups.map((group, groupIndex) => {
         const isGroupActive = group.value === activeValue
         const isSaleGroup = group.value === "sale"
@@ -200,6 +207,7 @@ const CatalogSidebar = ({
               groups={groups}
               activeValue={activeValue}
               onNavigate={onMobileClose}
+              bare
             />
           </div>
         </aside>

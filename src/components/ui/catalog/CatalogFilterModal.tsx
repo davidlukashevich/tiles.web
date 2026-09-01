@@ -68,7 +68,7 @@ const CatalogFilterModal = ({
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end bg-black/40 px-4 py-4 sm:items-center sm:justify-center">
+    <div className="fixed inset-0 z-50 flex items-stretch bg-black/40 sm:items-center sm:justify-center sm:px-4 sm:py-4">
       <button
         type="button"
         onClick={onClose}
@@ -76,7 +76,7 @@ const CatalogFilterModal = ({
         aria-label="Закрыть"
       />
 
-      <div className="relative max-h-[90vh] w-full overflow-y-auto rounded-[28px] bg-white p-5 shadow-2xl sm:max-w-[520px] sm:p-6">
+      <div className="relative h-full w-full overflow-y-auto rounded-none bg-white p-5 shadow-2xl sm:h-auto sm:max-h-[90vh] sm:max-w-[520px] sm:rounded-[28px] sm:p-6">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-xl font-medium uppercase text-black">
             Фильтрация

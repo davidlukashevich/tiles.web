@@ -104,7 +104,9 @@ export default function Header({
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/95 backdrop-blur">
+      {/* Фон непрозрачный: с bg-white/95 + backdrop-blur сквозь верхнюю кромку
+          просвечивал тёмный футер — по краю читалась тонкая полоса */}
+      <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white">
         <Container>
           <div className="flex min-h-[72px] items-center justify-between gap-3 xl:min-h-[84px]">
             <NavLink

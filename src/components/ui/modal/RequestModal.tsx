@@ -74,7 +74,7 @@ const RequestModal = ({
         touched[field] ? errors[field] : undefined
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-[100] flex items-stretch justify-center sm:items-center sm:px-4">
             {/* BACKDROP */}
             <button
                 type="button"
@@ -84,7 +84,7 @@ const RequestModal = ({
             />
 
             {/* MODAL */}
-            <div className="relative z-[101] max-h-[90vh] w-full max-w-[720px] overflow-y-auto rounded-[32px] bg-white p-6 shadow-2xl md:p-8">
+            <div className="relative z-[101] h-full w-full overflow-y-auto rounded-none bg-white p-5 shadow-2xl sm:h-auto sm:max-h-[90vh] sm:max-w-[720px] sm:rounded-[32px] sm:p-6 md:p-8">
                 {/* CLOSE */}
                 <button
                     type="button"

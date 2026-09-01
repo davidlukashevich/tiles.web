@@ -71,7 +71,7 @@ const ProjectModal = ({
         touched[field] ? errors[field] : undefined
 
     return (
-        <div className="fixed inset-0 z-[90] flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-[90] flex items-stretch justify-center sm:items-center sm:px-4">
             <button
                 type="button"
                 onClick={onClose}
@@ -79,7 +79,7 @@ const ProjectModal = ({
                 aria-label="Закрыть"
             />
 
-            <div className="relative z-[91] w-full max-w-[620px] rounded-[28px] bg-white p-6 shadow-2xl md:p-8">
+            <div className="relative z-[91] h-full w-full overflow-y-auto rounded-none bg-white p-5 shadow-2xl sm:h-auto sm:max-h-[90vh] sm:max-w-[620px] sm:rounded-[28px] sm:p-6 md:p-8">
                 <button
                     type="button"
                     onClick={onClose}
