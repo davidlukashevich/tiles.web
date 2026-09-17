@@ -86,13 +86,13 @@ const CatalogProductCard = ({
         </div>
       </NavLink>
 
-      <div className="flex flex-1 flex-col p-5 sm:p-6">
+      <div className="flex flex-1 flex-col p-5">
         <p className="mb-2 min-h-[20px] text-sm text-neutral-400">
           {product.category_name}
         </p>
 
         <NavLink to={productHref} state={fromState}>
-          <h3 className="mb-4 min-h-[56px] text-lg font-medium leading-snug text-black transition hover:text-neutral-600 sm:text-xl">
+          <h3 className="mb-3 min-h-[48px] text-base font-medium leading-snug text-black transition hover:text-neutral-600 sm:text-lg">
             {product.name}
           </h3>
         </NavLink>
@@ -107,7 +107,7 @@ const CatalogProductCard = ({
           {product.country_name ? <span>{product.country_name}</span> : null}
         </p>
 
-        <div className="flex min-h-[40px] flex-wrap items-start gap-x-2 gap-y-1 text-sm text-neutral-600">
+        <div className="flex min-h-[24px] flex-wrap items-start gap-x-2 gap-y-1 text-sm text-neutral-600">
           {product.sizes.length > 0 ? (
             <span>{product.sizes.join(", ")}</span>
           ) : null}
@@ -121,10 +121,10 @@ const CatalogProductCard = ({
           ) : null}
         </div>
 
-        <div className="mt-auto mb-5 flex flex-wrap items-end gap-x-3 gap-y-1 pt-5">
+        <div className="mt-auto mb-4 flex flex-wrap items-end gap-x-3 gap-y-1 pt-4">
           {product.displayPrice != null ? (
             <>
-              <p className="text-xl font-medium text-black sm:text-2xl">
+              <p className="text-lg font-medium text-black sm:text-xl">
                 {product.priceIsFrom ? "от " : ""}
                 {product.displayPrice} BYN
               </p>
@@ -136,7 +136,7 @@ const CatalogProductCard = ({
               ) : null}
             </>
           ) : (
-            <p className="text-xl font-medium text-black sm:text-2xl">
+            <p className="text-lg font-medium text-black sm:text-xl">
               Цена по запросу
             </p>
           )}
@@ -145,7 +145,7 @@ const CatalogProductCard = ({
         <NavLink
           to={productHref}
           state={fromState}
-          className="w-full rounded-2xl bg-white px-5 py-3 text-center text-sm font-medium text-black transition-colors hover:bg-black hover:text-white"
+          className="w-full rounded-2xl bg-white px-4 py-2.5 text-center text-[13px] font-medium text-black transition-colors hover:bg-black hover:text-white"
         >
           Подробнее
         </NavLink>

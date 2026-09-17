@@ -12,6 +12,12 @@ import {
 } from "../../../hooks/useProducts"
 import { productHrefBySlug } from "../../../helpers/slug"
 import { computeDisplayPrice, priceWithDiscount } from "../../../helpers/price"
+import { useSeo } from "../../../hooks/useSeo"
+import {
+  SITE_NAME,
+  absoluteUrl,
+  buildProductTitle,
+} from "../../../helpers/seo/site"
 
 const ProductContainer = () => {
   const [isRequestOpen, setIsRequestOpen] = useState(false)
@@ -167,6 +173,66 @@ const ProductContainer = () => {
 
     setFavorite(nextState)
   }
+
+  const sizeLabel =
+    viewProduct?.characteristics.find((item) => item.label === "Размер")
+      ?.value ?? ""
+
+  // Пока товар грузится — передаём null, чтобы в выдачу не попал
+  // заголовок страницы-заглушки.
+  useSeo(
+    viewProduct
+      ? {
+          title: buildProductTitle(viewProduct.title, sizeLabel),
+          description: [
+            viewProduct.title,
+            viewProduct.category,
+            viewProduct.manufacturer,
+            viewProduct.country,
+            viewProduct.price
+              ? `${viewProduct.priceIsFrom ? "от " : ""}${viewProduct.price} BYN`
+              : null,
+          ]
+            .filter(Boolean)
+            .join(" · ")
+            .slice(0, 300),
+          canonicalPath: productHrefBySlug(viewProduct.title),
+          image: viewProduct.image || undefined,
+          // Микроразметка товара: цена и наличие показываются прямо в выдаче
+          jsonLd: {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: viewProduct.title,
+            sku: viewProduct.sku,
+            image: viewProduct.images,
+            category: viewProduct.category,
+            ...(viewProduct.manufacturer
+              ? {
+                  brand: {
+                    "@type": "Brand",
+                    name: viewProduct.manufacturer,
+                  },
+                }
+              : {}),
+            ...(viewProduct.price
+              ? {
+                  offers: {
+                    "@type": "Offer",
+                    price: viewProduct.price,
+                    priceCurrency: "BYN",
+                    availability: "https://schema.org/InStock",
+                    url: absoluteUrl(productHrefBySlug(viewProduct.title)),
+                    seller: {
+                      "@type": "Organization",
+                      name: SITE_NAME,
+                    },
+                  },
+                }
+              : {}),
+          },
+        }
+      : null,
+  )
 
   return (
     <ProductView

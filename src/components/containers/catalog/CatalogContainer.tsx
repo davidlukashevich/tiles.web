@@ -33,6 +33,8 @@ import type { ProductQueryParams } from "../../../api/product.api"
 import { buildCatalogGroups } from "../../../helpers/Catalog/buildCatalogGroups"
 import { collectionMap } from "../../../helpers/Catalog/collectionMap"
 import { buildSelectionGroups } from "../../../helpers/Catalog/buildSelectionGroups"
+import { useSeo } from "../../../hooks/useSeo"
+import { buildTitle } from "../../../helpers/seo/site"
 
 const initialFilters: CatalogFilters = {
   priceFrom: "",
@@ -381,17 +383,28 @@ const CatalogContainer = () => {
     }
   }, [])
 
+  // Размеры из «Других размеров» лежат во вложенном children, поэтому
+  // разворачиваем оба уровня: иначе для 34 категорий из 39 не находится
+  // активный пункт и заголовок страницы падает в общее «Каталог».
+  const flatItems = useMemo(() => {
+    return catalogGroups.flatMap((group) =>
+      group.items.flatMap((item) => [item, ...(item.children ?? [])]),
+    )
+  }, [catalogGroups])
+
   const activeItem = useMemo(() => {
-    return catalogGroups
-      .flatMap((group) => group.items)
-      .find((item) => item.value === activeCategory)
-  }, [activeCategory, catalogGroups])
+    return flatItems.find((item) => item.value === activeCategory)
+  }, [activeCategory, flatItems])
 
   const activeGroup = useMemo(() => {
     return catalogGroups.find((group) => {
       return (
         group.value === activeCategory ||
-        group.items.some((item) => item.value === activeCategory)
+        group.items.some(
+          (item) =>
+            item.value === activeCategory ||
+            item.children?.some((child) => child.value === activeCategory),
+        )
       )
     })
   }, [activeCategory, catalogGroups])
@@ -429,6 +442,15 @@ const CatalogContainer = () => {
         : activeGroup?.value === "accessories"
           ? "Сопутствующие товары для укладки и ухода за плиткой."
           : "Выберите нужный товар из каталога."
+
+  // canonical берётся из pathname без query: страницы фильтров и пагинации
+  // не должны попадать в индекс как отдельные документы.
+  useSeo({
+    title: buildTitle(`${title} — купить в Иваново`),
+    // Без служебного хвоста про фильтр: в сниппет влезает ~160 символов,
+    // и они должны работать на клик, а не на инструкцию по сайту.
+    description: `${title} в Иваново: цены, размеры и фото. Доставка по всей Беларуси, консультация по подбору.`,
+  })
 
   return (
     <CatalogView

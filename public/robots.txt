@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Поиск и пагинация каталога не должны плодить дубли в индексе.
+# Имена параметров взяты из CatalogContainer: ?q= и ?page=
+Clean-param: q&page
+
+Sitemap: https://kvadratnymetr.by/sitemap.xml
