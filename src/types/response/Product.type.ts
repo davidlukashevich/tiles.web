@@ -51,6 +51,8 @@ export type ProductWithImage = Product & {
 
 // То, что реально показывает карточка каталога: товар + картинка + размеры + флаги
 export type CatalogCardProduct = ProductWithImage & {
+  // адрес товара: у одноимённых товаров он содержит артикул
+  href: string
   sizes: string[]
   surfaces: string[]
   isOnSale: boolean

@@ -7,6 +7,7 @@ import {
 } from "../../../helpers/Favorite/favorite"
 import {
   useProduct,
+  useProductHrefs,
   useProductImages,
   useProductVariants,
 } from "../../../hooks/useProducts"
@@ -168,11 +169,19 @@ const ProductContainer = () => {
       image: viewProduct.image,
       price: viewProduct.price,
       oldPrice: viewProduct.oldPrice,
-      href: productHrefBySlug(viewProduct.title),
+      href: selfHref,
     })
 
     setFavorite(nextState)
   }
+
+  // Собственный адрес товара — тот же, что и в каталоге: у одноимённых
+  // позиций он содержит артикул. Нужен для canonical и микроразметки.
+  const productHrefs = useProductHrefs()
+
+  const selfHref = product
+    ? productHrefs.get(product.id) ?? productHrefBySlug(product.name)
+    : ""
 
   const sizeLabel =
     viewProduct?.characteristics.find((item) => item.label === "Размер")
@@ -196,7 +205,7 @@ const ProductContainer = () => {
             .filter(Boolean)
             .join(" · ")
             .slice(0, 300),
-          canonicalPath: productHrefBySlug(viewProduct.title),
+          canonicalPath: selfHref,
           image: viewProduct.image || undefined,
           // Микроразметка товара: цена и наличие показываются прямо в выдаче
           jsonLd: {
@@ -221,7 +230,7 @@ const ProductContainer = () => {
                     price: viewProduct.price,
                     priceCurrency: "BYN",
                     availability: "https://schema.org/InStock",
-                    url: absoluteUrl(productHrefBySlug(viewProduct.title)),
+                    url: absoluteUrl(selfHref),
                     seller: {
                       "@type": "Organization",
                       name: SITE_NAME,

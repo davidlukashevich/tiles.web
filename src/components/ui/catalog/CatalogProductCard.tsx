@@ -2,7 +2,6 @@ import { useState } from "react"
 import { NavLink, useLocation } from "react-router-dom"
 import { FaHeart, FaRegImage } from "react-icons/fa6"
 import type { CatalogCardProduct } from "../../../types/response/Product.type"
-import { productHrefBySlug } from "../../../helpers/slug"
 
 type Props = {
   product: CatalogCardProduct
@@ -18,7 +17,7 @@ const CatalogProductCard = ({
   isFavorite,
   onToggleFavorite,
 }: Props) => {
-  const productHref = productHrefBySlug(product.name)
+  const productHref = product.href
 
   const location = useLocation()
   const fromState = { from: `${location.pathname}${location.search}` }

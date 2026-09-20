@@ -81,7 +81,7 @@ const main = async () => {
 
   const [categories, products] = await Promise.all([
     fetchRows(env, "public_categories_view", "slug,parent_id"),
-    fetchRows(env, "public_products_view", "name"),
+    fetchRows(env, "public_products_view", "id,name,sku"),
   ])
 
   const paths = [
@@ -98,6 +98,31 @@ const main = async () => {
     ["/terms", "0.2", "yearly"],
   ]
 
+  // Подборки по фактуре: /catalog/selections/wood и прочие. Ловят запросы
+  // вида «плитка под дерево» — одни из самых ходовых в нише, поэтому в
+  // карту попадают обязательно.
+  //
+  // Слаги продублированы из src/helpers/Catalog/collectionMap.ts: адреса
+  // обязаны совпадать с теми, что строит меню.
+  const SELECTION_SLUGS = [
+    "marble",
+    "concrete",
+    "stone",
+    "onyx",
+    "wood",
+    "terrazzo",
+    "patchwork",
+    "travertine",
+    "brick",
+    "rust",
+    "monocolor",
+    "decor",
+  ]
+
+  for (const slug of SELECTION_SLUGS) {
+    paths.push([`/catalog/selections/${slug}`, "0.8", "weekly"])
+  }
+
   // Размеры плитки — это категории верхнего уровня, именно они
   // и выведены в сайдбаре каталога.
   for (const category of categories) {
@@ -105,16 +130,36 @@ const main = async () => {
     paths.push([`/catalog/tiles/${category.slug}`, "0.8", "weekly"])
   }
 
-  const seen = new Set()
+  // Те же правила, что и на фронтенде (src/helpers/slug.ts): уникальное
+  // название — короткий адрес, совпадающие названия — с артикулом.
+  // Расхождение здесь означало бы карту сайта с несуществующими адресами.
+  const bySlug = new Map()
 
   for (const product of products) {
     if (!product.name) continue
 
     const slug = slugify(product.name)
-    if (!slug || seen.has(slug)) continue
+    if (!slug) continue
 
-    seen.add(slug)
-    paths.push([`/product/${slug}`, "0.6", "weekly"])
+    const bucket = bySlug.get(slug)
+    if (bucket) bucket.push(product)
+    else bySlug.set(slug, [product])
+  }
+
+  let collisions = 0
+
+  for (const [slug, items] of bySlug) {
+    if (items.length === 1) {
+      paths.push([`/product/${slug}`, "0.6", "weekly"])
+      continue
+    }
+
+    collisions += items.length
+
+    for (const item of items) {
+      const suffix = item.sku ? slugify(item.sku) : String(item.id).slice(0, 8)
+      paths.push([`/product/${slug}-${suffix}`, "0.6", "weekly"])
+    }
   }
 
   const xml =
@@ -124,7 +169,10 @@ const main = async () => {
     `\n</urlset>\n`
 
   writeFileSync(resolve(ROOT, "dist/sitemap.xml"), xml)
-  console.log(`sitemap.xml: ${paths.length} адресов (товаров: ${seen.size})`)
+  console.log(
+    `sitemap.xml: ${paths.length} адресов ` +
+      `(одноимённых товаров с артикулом в адресе: ${collisions})`,
+  )
 }
 
 main().catch((error) => {

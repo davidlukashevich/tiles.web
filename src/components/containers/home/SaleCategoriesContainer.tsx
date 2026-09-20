@@ -6,9 +6,10 @@ import {
 import type { SaleItem } from "../../../types/ui/Sale.type"
 import SaleCategories from "../../ui/home/SaleCategories"
 import {
+  useProductHrefs,
   useProductImages,
-  useProducts,
   useProductVariants,
+  useProducts,
 } from "../../../hooks/useProducts"
 import { useImagesReady } from "../../../hooks/useImagesReady"
 import { productHrefBySlug } from "../../../helpers/slug"
@@ -40,6 +41,9 @@ const SaleCategoriesContainer = () => {
     useProductImages(productIds)
   const { data: productVariants = [], isLoading: isVariantsLoading } =
     useProductVariants(productIds)
+
+  // Адреса товаров: у одноимённых позиций содержат артикул
+  const productHrefs = useProductHrefs()
 
   const imagesMap = useMemo(() => {
     const map = new Map<string, string>()
@@ -90,10 +94,11 @@ const SaleCategoriesContainer = () => {
         price,
         oldPrice,
         isSale: true,
-        href: productHrefBySlug(product.name),
+        href:
+          productHrefs.get(product.id) ?? productHrefBySlug(product.name),
       }
     })
-  }, [topProducts, productVariants, imagesMap])
+  }, [topProducts, productVariants, imagesMap, productHrefs])
 
   const imageUrls = useMemo(
     () => saleItems.map((item) => item.image).filter(Boolean),

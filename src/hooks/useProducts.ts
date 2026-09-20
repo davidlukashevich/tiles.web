@@ -1,4 +1,7 @@
+import { useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
+
+import { buildProductHrefs } from "../helpers/slug"
 import {
   getProductById,
   getProductImagesByProductIds,
@@ -79,4 +82,12 @@ export const useProductVariants = (productIds: string[]) => {
     queryFn: () => getProductVariantsByProductIds(productIds),
     enabled: productIds.length > 0,
   })
+}
+
+// Карта id -> адрес товара. Строится по всему индексу, а не по текущей
+// выборке: понять, что название неуникально, можно только зная весь каталог.
+export const useProductHrefs = () => {
+  const { data: index = [] } = useProductIndex()
+
+  return useMemo(() => buildProductHrefs(index), [index])
 }

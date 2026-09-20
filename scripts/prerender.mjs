@@ -17,7 +17,8 @@ import puppeteer from "puppeteer"
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..")
 const DIST = resolve(ROOT, "dist")
 const PORT = 4179
-const CONCURRENCY = 6
+const CONCURRENCY = 4
+const RESTART_EVERY = 150
 
 const MIME = {
     ".html": "text/html; charset=utf-8",
@@ -72,10 +73,73 @@ const savePage = (route, html) => {
     writeFileSync(target, html)
 }
 
-const renderRoute = async (browser, route, attempt = 1) => {
-    const page = await browser.newPage()
+// Закрытие страницы не должно ронять прогон: если браузер уже умер,
+// любой вызов к нему бросает ConnectionClosedError.
+const safeClose = async (page) => {
+    if (!page) return
 
     try {
+        if (!page.isClosed()) await page.close()
+    } catch {
+        // браузера уже нет — закрывать нечего
+    }
+}
+
+let browser = null
+
+const launchBrowser = () =>
+    puppeteer.launch({
+        headless: true,
+        args: ["--no-sandbox", "--disable-dev-shm-usage"],
+    })
+
+const closeBrowser = async () => {
+    if (!browser) return
+
+    try {
+        await browser.close()
+    } catch {
+        // уже мёртв
+    }
+
+    browser = null
+}
+
+// Chrome может уйти по памяти на длинном прогоне. Тогда поднимаем новый
+// и продолжаем с того же места, вместо падения всей сборки.
+const ensureBrowser = async () => {
+    if (browser && browser.connected) return browser
+
+    if (browser) {
+        await closeBrowser()
+        console.log("  браузер отвалился — поднимаю заново")
+    }
+
+    browser = await launchBrowser()
+    return browser
+}
+
+const renderRoute = async (route, attempt = 1) => {
+    let page = null
+
+    try {
+        // newPage внутри try: браузер может умереть и на этом шаге
+        const active = await ensureBrowser()
+        page = await active.newPage()
+
+        // Метрика не должна срабатывать на сборке: иначе в отчёты уйдут
+        // сотни визитов с машины разработчика. Режем запросы к счётчику —
+        // сам его код при этом остаётся в готовом HTML.
+        await page.setRequestInterception(true)
+        page.on("request", (request) => {
+            if (request.url().includes("mc.yandex.")) {
+                request.abort().catch(() => {})
+                return
+            }
+
+            request.continue().catch(() => {})
+        })
+
         await page.setViewport({ width: 1366, height: 900 })
 
         await page.goto(`http://localhost:${PORT}${route}`, {
@@ -98,16 +162,16 @@ const renderRoute = async (browser, route, attempt = 1) => {
         savePage(route, html)
         return { route, ok: true }
     } catch (error) {
-        // Сетевые таймауты на общей машине случайны — один повтор
-        // дешевле, чем дырка в индексе на весь срок до следующей сборки.
-        if (attempt < 2) {
-            await page.close()
-            return renderRoute(browser, route, attempt + 1)
+        // Таймауты и падения браузера на длинном прогоне случайны —
+        // повтор дешевле, чем дырка в индексе до следующей сборки.
+        if (attempt < 3) {
+            await safeClose(page)
+            return renderRoute(route, attempt + 1)
         }
 
         return { route, ok: false, error: error.message }
     } finally {
-        if (!page.isClosed()) await page.close()
+        await safeClose(page)
     }
 }
 
@@ -115,31 +179,43 @@ const main = async () => {
     const only = process.argv.slice(2)
     const routes = only.length ? only : readRoutes()
     const server = await startServer()
-    const browser = await puppeteer.launch({ headless: true })
+
+    await ensureBrowser()
 
     console.log(`Пререндер: ${routes.length} адресов, по ${CONCURRENCY} за раз`)
 
     const queue = [...routes]
     const failed = []
     let done = 0
+    let sinceRestart = 0
 
-    const worker = async () => {
-        while (queue.length) {
-            const route = queue.shift()
-            const result = await renderRoute(browser, route)
+    // Идём пачками, а не бесконечными воркерами: на границе пачки открытых
+    // страниц нет, и браузер можно безопасно перезапустить. Перезапуск на
+    // ходу убивал страницы соседних воркеров.
+    while (queue.length) {
+        const batch = queue.splice(0, CONCURRENCY)
+        const results = await Promise.all(batch.map((route) => renderRoute(route)))
 
+        for (const result of results) {
             done += 1
             if (!result.ok) failed.push(result)
+        }
 
-            if (done % 50 === 0 || done === routes.length) {
-                console.log(`  ${done}/${routes.length}`)
-            }
+        if (done % 50 < CONCURRENCY || !queue.length) {
+            console.log(`  ${done}/${routes.length}`)
+        }
+
+        sinceRestart += batch.length
+
+        // Профилактика: Chrome копит память на сотнях страниц.
+        if (sinceRestart >= RESTART_EVERY && queue.length) {
+            sinceRestart = 0
+            await closeBrowser()
+            await ensureBrowser()
         }
     }
 
-    await Promise.all(Array.from({ length: CONCURRENCY }, worker))
-
-    await browser.close()
+    await closeBrowser()
     server.close()
 
     if (failed.length) {

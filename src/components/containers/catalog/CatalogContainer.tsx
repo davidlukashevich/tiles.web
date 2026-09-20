@@ -16,6 +16,7 @@ import {
 
 import { useCategories } from "../../../hooks/useCategories"
 import {
+  useProductHrefs,
   useProductImages,
   useProducts,
   useVariantIndex,
@@ -31,7 +32,10 @@ import {
 import type { ProductQueryParams } from "../../../api/product.api"
 
 import { buildCatalogGroups } from "../../../helpers/Catalog/buildCatalogGroups"
-import { collectionMap } from "../../../helpers/Catalog/collectionMap"
+import {
+  collectionMap,
+  collectionSeoPhrase,
+} from "../../../helpers/Catalog/collectionMap"
 import { buildSelectionGroups } from "../../../helpers/Catalog/buildSelectionGroups"
 import { useSeo } from "../../../hooks/useSeo"
 import { buildTitle } from "../../../helpers/seo/site"
@@ -170,6 +174,20 @@ const CatalogContainer = () => {
       : ""
   }, [categories, productsData, categorySlug])
 
+  // Адреса товаров: у одноимённых позиций в адрес входит артикул,
+  // иначе обе карточки вели бы на одну страницу.
+  const productHrefs = useProductHrefs()
+
+  // Название текущего раздела — им подписываем карточки, найденные
+  // по варианту, а не по своей категории.
+  const categoryTitle = useMemo(() => {
+    if (!categorySlug) return ""
+
+    return (
+      categories.find((category) => category.slug === categorySlug)?.name ?? ""
+    )
+  }, [categories, categorySlug])
+
   // Товар виден в категории, если он к ней привязан ИЛИ у него есть вариант
   // такого размера. Объединение, а не замена: иначе товар пропал бы из своей
   // же категории, когда среди вариантов нет её размера.
@@ -207,10 +225,35 @@ const CatalogContainer = () => {
 
       const display = computeDisplayPrice(variants)
 
+      // Товар попадает в раздел и по варианту: «Berlin антрацит» из
+      // категории 120x60 виден в разделе 60x60, потому что такой вариант
+      // у него есть. Подпись при этом должна называть раздел, в котором
+      // человек находится, иначе карточка противоречит заголовку страницы.
+      const matchedByVariant =
+        categorySize !== "" &&
+        product.category_slug !== categorySlug &&
+        sizes.some((size) => normalizeSize(size) === categorySize)
+
+      const categoryLabel =
+        matchedByVariant && categoryTitle
+          ? categoryTitle
+          : product.category_name
+
+      // Искомый размер — первым в списке, остальные следом
+      const orderedSizes = matchedByVariant
+        ? [
+            ...sizes.filter((size) => normalizeSize(size) === categorySize),
+            ...sizes.filter((size) => normalizeSize(size) !== categorySize),
+          ]
+        : sizes
+
       return {
         ...product,
+        category_name: categoryLabel,
+        href:
+          productHrefs.get(product.id) ?? productHrefBySlug(product.name),
         image_url: null,
-        sizes,
+        sizes: orderedSizes,
         surfaces,
         isOnSale: variants.some((v) => v.is_on_sale),
         isRecommended: variants.some((v) => v.is_recommended),
@@ -219,7 +262,14 @@ const CatalogContainer = () => {
         priceIsFrom: display.isFrom,
       }
     })
-  }, [products, variantsByProduct])
+  }, [
+    products,
+    variantsByProduct,
+    categorySize,
+    categorySlug,
+    categoryTitle,
+    productHrefs,
+  ])
 
   // Страница и поисковый запрос живут в URL (?page=N&q=...), чтобы «назад»
   // из карточки товара возвращал к тем же результатам.
@@ -423,7 +473,7 @@ const CatalogContainer = () => {
       image: product.image_url ?? "",
       price: product.price_from ?? 0,
       oldPrice: undefined,
-      href: productHrefBySlug(product.name),
+      href: productHrefs.get(product.id) ?? productHrefBySlug(product.name),
     })
 
     setFavoriteIds(getFavorites().map((item) => item.id))
@@ -445,11 +495,17 @@ const CatalogContainer = () => {
 
   // canonical берётся из pathname без query: страницы фильтров и пагинации
   // не должны попадать в индекс как отдельные документы.
+  // Для подборок заголовок строится иначе: в меню пункт называется
+  // «Дерево», а ищут «плитку под дерево».
+  const seoSubject = isSelectionPage
+    ? `Плитка ${collectionSeoPhrase[selectionSlug] ?? (collectionName || title)}`
+    : title
+
   useSeo({
-    title: buildTitle(`${title} — купить в Иваново`),
+    title: buildTitle(`${seoSubject} — купить в Иваново`),
     // Без служебного хвоста про фильтр: в сниппет влезает ~160 символов,
     // и они должны работать на клик, а не на инструкцию по сайту.
-    description: `${title} в Иваново: цены, размеры и фото. Доставка по всей Беларуси, консультация по подбору.`,
+    description: `${seoSubject} в Иваново: цены, размеры и фото. Доставка по всей Беларуси, консультация по подбору.`,
   })
 
   return (

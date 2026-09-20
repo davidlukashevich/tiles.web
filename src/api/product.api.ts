@@ -147,6 +147,16 @@ export const resolveProductId = (
 ): string | undefined => {
     if (UUID_RE.test(identifier)) return identifier
 
+    // «название-артикул» — форма для товаров с совпадающими названиями.
+    // Проверяем её первой: она однозначна, в отличие от короткой.
+    const bySlugAndSku = index.find(
+        (item) =>
+            `${slugify(item.name)}-${slugify(item.sku ?? "")}` === identifier,
+    )
+    if (bySlugAndSku) return bySlugAndSku.id
+
+    // Короткая форма: работает для уникальных названий и сохраняет
+    // совместимость со старыми ссылками.
     const bySlug = index.find((item) => slugify(item.name) === identifier)
     if (bySlug) return bySlug.id
 
